@@ -199,11 +199,11 @@ export default function ThenvueCaseStudy() {
               </div>
               <div className="cs-feature-item">
                 <div>
-                  <h4>RAG Design &amp; Anti-Hallucination Guardrails</h4>
+                  <h4>Grounded RAG Architecture &amp; Citations</h4>
                   <span className="tag">Trust &amp; Alignment</span>
                 </div>
                 <p>
-                  Designed the grounded RAG architecture combining 768-dimensional Gemini embeddings (`pgvector`) with metadata filters. Authored defensive system prompts enforcing strict source citation requirements to eliminate hallucinated memories.
+                  Designed the grounded RAG architecture combining 768-dimensional Gemini embeddings (`pgvector`) with metadata filters. Authored defensive system prompts requiring the model to answer strictly using retrieved memory excerpts and attach verified source citations, falling back gracefully when context is insufficient.
                 </p>
               </div>
               <div className="cs-feature-item">
@@ -269,7 +269,7 @@ export default function ThenvueCaseStudy() {
             <div className="cs-mockup-bar">
               <div className="cs-mockup-dots"><i /><i /><i /></div>
               <span>thenvue.app / ask-your-life / grounded-rag</span>
-              <span>Strict Zero-Hallucination Prompt</span>
+              <span>Grounded RAG · Source Citation Prompt</span>
             </div>
             <div className="cs-mockup-content">
               <div style={{ background: '#242722', padding: '22px', borderRadius: '4px', border: '1px solid #3a3f35' }}>
@@ -424,7 +424,7 @@ export default function ThenvueCaseStudy() {
                   <span className="cs-status-tag built">Built &amp; Tested</span>
                 </div>
                 <p>
-                  Natural language grounded Q&amp;A assistant with strict anti-hallucination prompt and clickable citation chips on Web; semantic cosine distance RPC on Supabase.
+                  Natural language grounded Q&amp;A assistant answering strictly from retrieved memory context with clickable citation chips; semantic cosine distance RPC on Supabase.
                 </p>
               </div>
 
@@ -470,38 +470,38 @@ export default function ThenvueCaseStudy() {
             </div>
           </section>
 
-          {/* Section 8: Product Evaluation & Success Metrics */}
+          {/* Section 8: AI Product Guardrails & Technical Decisions */}
           <section className="cs-section reveal" id="metrics">
-            <div className="cs-section-eyebrow">08 / Evaluation &amp; Metrics</div>
+            <div className="cs-section-eyebrow">08 / AI Guardrails &amp; Product Decisions</div>
             <h2 className="cs-section-heading">
-              How I evaluate this product: <em>Core metrics &amp; guardrail health</em>.
+              Designing for user trust: <em>Latency, retrieval tuning, and grounding</em>.
             </h2>
             <div className="cs-decisions-grid">
               <div className="cs-decision-card">
                 <div className="cs-decision-header">
-                  <h3 className="cs-decision-title">Capture Velocity (&lt; 12s)</h3>
-                  <span className="cs-decision-number">METRIC 01</span>
+                  <h3 className="cs-decision-title">Optimistic Ingestion vs. Model Latency</h3>
+                  <span className="cs-decision-number">DECISION 01</span>
                 </div>
                 <p style={{ margin: 0, fontSize: '14px', color: '#40423d', lineHeight: '1.6' }}>
-                  Targeted &lt; 12s time-to-capture for audio and quick notes via optimistic UI updates, cutting abandonment compared to traditional reflective journaling apps (&gt; 45s).
+                  Decoupled capture from inference. Users save voice memos and notes instantly with optimistic UI states, while Gemini Flash auto-tagging and 768-dim embedding generation run asynchronously in background queues.
                 </p>
               </div>
               <div className="cs-decision-card">
                 <div className="cs-decision-header">
-                  <h3 className="cs-decision-title">Semantic Retrieval Precision</h3>
-                  <span className="cs-decision-number">METRIC 02</span>
+                  <h3 className="cs-decision-title">Hybrid Retrieval &amp; Threshold Tuning</h3>
+                  <span className="cs-decision-number">DECISION 02</span>
                 </div>
                 <p style={{ margin: 0, fontSize: '14px', color: '#40423d', lineHeight: '1.6' }}>
-                  Calibrated the cosine distance threshold at 0.72 on 768-dim embeddings, maintaining high semantic recall for affective queries without returning noisy, irrelevant memories.
+                  Combined a calibrated 0.72 cosine similarity cutoff on 768-dim embeddings with SQL metadata filters (date ranges, people pills), balancing associative recall for conceptual queries against noisy matches.
                 </p>
               </div>
               <div className="cs-decision-card">
                 <div className="cs-decision-header">
-                  <h3 className="cs-decision-title">Zero-Hallucination Citation Fidelity</h3>
-                  <span className="cs-decision-number">METRIC 03</span>
+                  <h3 className="cs-decision-title">Grounded Synthesis &amp; Source Citations</h3>
+                  <span className="cs-decision-number">DECISION 03</span>
                 </div>
                 <p style={{ margin: 0, fontSize: '14px', color: '#40423d', lineHeight: '1.6' }}>
-                  Enforced a 100% grounded citation rule in &ldquo;Ask Your Life&rdquo;. Every factual synthesis links to verified memory IDs; ungrounded assertions trigger a fallback to protect user trust.
+                  Structured the &ldquo;Ask Your Life&rdquo; synthesis prompt to answer strictly using retrieved memory context, attaching verifiable source citation chips so users can trace every assertion back to the original memory record.
                 </p>
               </div>
             </div>
@@ -526,9 +526,9 @@ export default function ThenvueCaseStudy() {
               </p>
             </div>
             <div className="cs-callout">
-              <strong>3. Guardrails matter more than model creativity</strong>
+              <strong>3. Grounding matters more than model creativity</strong>
               <p>
-                In consumer life-logging, an AI hallucination is fatal to user trust. If the AI invents an event that never happened, the user deletes the app. Prompt engineering had to be defensively structured around zero-hallucination policies and mandatory memory citations.
+                In consumer life-logging, hallucinated memories break user trust immediately. If the AI invents an event that never happened, the user deletes the app. Prompt design had to be defensively structured around strict citation grounding, bounded context, and transparent fallback behavior when information is missing.
               </p>
             </div>
           </section>

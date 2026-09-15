@@ -10,7 +10,7 @@ const ThinkingWallHero = dynamic(() => import('./components/hero-3d/ThinkingWall
 
 const skillGroups = [
   ['Product Strategy', '0 → 1 Building', 'PRDs & User Stories', 'Feature Prioritization', 'Fulfillment Workflows'],
-  ['AI Product Thinking', 'Multimodal LLM Pipelines', 'Prompt Architecture', 'Vector Search (pgvector)', 'Zero-Hallucination RAG'],
+  ['AI Product Thinking', 'Multimodal LLM Pipelines', 'Prompt Architecture', 'Vector Search (pgvector)', 'Grounded RAG & Citations'],
   ['UX & Design Craft', 'Interaction Design', 'Tactile Micro-animations', 'Design Systems', 'Mobile Ergonomics'],
   ['Technical Execution', 'Next.js & React Native', 'Supabase & PostgreSQL', 'API Webhook Architecture', 'Agile Sprint Leadership'],
 ]
@@ -405,12 +405,12 @@ export default function Page() {
         <div className="hero-overlay-container container">
           <div className="hero-text-block">
             <div className="hero-identity-layer">
-              <span className="hero-identity-name">Hi, I’m Dhananjay.</span>
-              <span className="hero-identity-meta">Product Manager · AI Systems · 0 → 1</span>
+              <span className="hero-identity-name">Hi, I’m Dhananjay Chaddha.</span>
+              <span className="hero-identity-meta">Product Manager · AI · 0 → 1</span>
             </div>
 
             <h1 className="hero-cinematic-title">
-              Turning complex problems and emerging tech into <em>shipped, high-impact products.</em>
+              Turning ambiguous customer problems into <em>shipped 0→1 products.</em>
             </h1>
           </div>
 
@@ -445,7 +445,7 @@ export default function Page() {
                   <p className="project-type">0 → 1 AI Product Management</p>
                   <h3>Thenvue</h3>
                   <p className="project-description">
-                    Eliminating blank-page journaling friction through zero-effort multimodal capture, associative semantic recall (Gemini + pgvector), and strict zero-hallucination citation guardrails.
+                    Eliminating blank-page journaling friction through zero-effort multimodal capture, associative semantic recall (Gemini + pgvector), and grounded memory citations.
                   </p>
                   <Link className="circle-link" href="/thenvue" aria-label="View Thenvue case study">
                     ↗
@@ -579,7 +579,7 @@ export default function Page() {
             <span>2025 — Present</span>
             <div>
               <h3>Product Lead · Merchow &amp; Thenvue</h3>
-              <p>Leading 0→1 product roadmaps, PRD authoring, 10+ customer discovery interviews, and sprint execution across a 5-member engineering team for Merchow; architected multimodal AI retrieval and zero-hallucination RAG for Thenvue.</p>
+              <p>Leading 0→1 product roadmaps, PRD authoring, 10+ customer discovery interviews, and sprint execution across a 5-member engineering team for Merchow; architected multimodal AI retrieval and grounded memory RAG for Thenvue.</p>
             </div>
             <b>↗</b>
           </Reveal>

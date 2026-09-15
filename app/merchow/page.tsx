@@ -63,7 +63,7 @@ export default function MerchowCaseStudy() {
           <div className="cs-meta-item">
             <small>Validation Stage</small>
             <strong>Beta Cohort (20+ Creators)</strong>
-            <p>10+ discovery interviews, +35% engagement lift, 0 manual routing errors</p>
+            <p>10+ discovery interviews, automated print routing, +35% engagement lift</p>
           </div>
         </div>
       </section>
@@ -251,10 +251,10 @@ export default function MerchowCaseStudy() {
               Leading a 5-member engineering team through <em>API contracts</em>.
             </h2>
             <p>
-              I led a cross-functional team of 5 engineers. To maintain momentum, we ran two-week Agile sprints with explicit PRDs, acceptance criteria, and Figma wireframes before code was written.
+              I worked as product lead alongside a 5-member cross-functional engineering team. My responsibility was keeping the roadmap clear and execution unblocked: authoring PRDs, mapping user stories, running sprint planning, and specifying Figma UX wireframes before any code was committed.
             </p>
             <p>
-              <strong>The Fulfillment Pipeline:</strong> I designed the end-to-end order orchestration engine bridging consumer checkout and Qikink&rsquo;s manufacturing API:
+              <strong>The Fulfillment Architecture:</strong> I defined the end-to-end order orchestration requirements bridging consumer checkout and Qikink&rsquo;s manufacturing API:
             </p>
 
             {/* Visual Flow Diagram */}

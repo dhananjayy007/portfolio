@@ -351,7 +351,7 @@ export default function ThinkingWallHero() {
 
       ctx.fillStyle = '#7a8770'
       ctx.font = '11px ui-monospace, monospace'
-      ctx.fillText('Latency: 48ms · Zero Hallucination RAG', 18, 222)
+      ctx.fillText('Cosine match · Grounded Memory RAG', 18, 222)
     })
     addPinnedArtifact(-1.9, -0.85, 0.88, 0.75, -0.02, texVectorCluster)
 
