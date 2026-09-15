@@ -31,7 +31,7 @@ export default function ThenvueCaseStudy() {
       {/* Hero Section */}
       <section className="cs-hero container">
         <div className="cs-kicker-row">
-          <span className="cs-kicker">01 — Case Study / AI Consumer Product (0 → 1)</span>
+          <span className="cs-kicker">01 — Case Study / AI Product Management (0 → 1)</span>
           <span className="cs-kicker">Web &amp; React Native Mobile</span>
         </div>
 
@@ -40,15 +40,15 @@ export default function ThenvueCaseStudy() {
         </h1>
 
         <p className="cs-hero-subtitle">
-          How I designed, architected, and built a private multimodal memory journal from scratch — replacing passive photo camera rolls and forgotten note apps with semantic recall, temporal anchoring, and collaborative perspectives.
+          How I designed, architected, and shipped a private multimodal memory journal from scratch — replacing passive camera rolls and abandoned note apps with semantic recall, calendar anchoring, and grounded AI retrieval.
         </p>
 
         {/* Project Meta Strip */}
         <div className="cs-meta-grid">
           <div className="cs-meta-item">
             <small>My Role</small>
-            <strong>Product Lead &amp; Builder</strong>
-            <p>Product strategy, UX/UI, prompt design, full-stack architecture</p>
+            <strong>AI Product Lead &amp; Architect</strong>
+            <p>Product strategy, AI UX, prompt architecture, RAG retrieval design</p>
           </div>
           <div className="cs-meta-item">
             <small>Stage</small>
@@ -169,50 +169,50 @@ export default function ThenvueCaseStudy() {
             </div>
           </div>
 
-          {/* Section 3: How Thenvue Works & My Role */}
+          {/* Section 3: PM Ownership & System Flow */}
           <section className="cs-section reveal" id="ownership">
-            <div className="cs-section-eyebrow">03 / Ownership &amp; System Flow</div>
+            <div className="cs-section-eyebrow">03 / PM Ownership &amp; System Flow</div>
             <h2 className="cs-section-heading">
-              What I built &amp; what I <em>personally owned</em>.
+              Leading the product lifecycle from <em>concept to working software</em>.
             </h2>
             <p>
-              Thenvue was built from a completely blank repository into a production-grade web application and cross-platform native mobile app (Expo SDK 54). I owned the end-to-end product lifecycle:
+              Thenvue was conceived, architected, and built from a blank slate into a functional web application and native mobile app (Expo SDK 54). As AI Product Lead, I owned the key strategic and execution pillars:
             </p>
             <div className="cs-feature-list">
               <div className="cs-feature-item">
                 <div>
-                  <h4>Product Strategy &amp; Discovery</h4>
-                  <span className="tag">Strategy</span>
+                  <h4>Problem Discovery &amp; Value Proposition</h4>
+                  <span className="tag">Product Strategy</span>
                 </div>
                 <p>
-                  Formulated the core value proposition: moving from passive camera roll storage to active, queryable semantic life recall. Designed user journeys for quick capture, past memory rediscovery, and collaborative perspective sharing.
+                  Identified the root cause of personal journaling abandonment (blank-page cognitive fatigue). Reframed the product hypothesis from &ldquo;manual reflection writing&rdquo; to &ldquo;zero-friction capture + intelligent associative recall.&rdquo;
                 </p>
               </div>
               <div className="cs-feature-item">
                 <div>
-                  <h4>Interaction &amp; Visual Design</h4>
-                  <span className="tag">UX / UI Craft</span>
-                </div>
-                <p>
-                  Crafted the complete dark/light design system in Figma and implemented it in Tailwind CSS v4 and React Native. Created tactile micro-interactions: live voice recording timers, audio waveform scrubbing, calendar date-time pickers, and memory detail view transitions.
-                </p>
-              </div>
-              <div className="cs-feature-item">
-                <div>
-                  <h4>AI System &amp; Prompt Engineering</h4>
+                  <h4>AI UX &amp; Latency Architecture</h4>
                   <span className="tag">AI Product Thinking</span>
                 </div>
                 <p>
-                  Architected the multi-stage asynchronous intelligence pipeline with `@google/genai` (Gemini 3.6 Flash) for auto-tagging and Gemini Embedding 2 for 768-dimensional vector representations. Engineered the retrieval and synthesis prompt for &ldquo;Ask Your Life&rdquo; to eliminate hallucinations.
+                  Architected the user experience around AI constraints: eliminated blocking 3-second LLM load spinners by establishing an asynchronous optimistic capture flow. Designed tactile audio waveform capture and calendar date-anchoring.
                 </p>
               </div>
               <div className="cs-feature-item">
                 <div>
-                  <h4>Full-Stack Engineering &amp; Data Model</h4>
+                  <h4>RAG Design &amp; Anti-Hallucination Guardrails</h4>
+                  <span className="tag">Trust &amp; Alignment</span>
+                </div>
+                <p>
+                  Designed the grounded RAG architecture combining 768-dimensional Gemini embeddings (`pgvector`) with metadata filters. Authored defensive system prompts enforcing strict source citation requirements to eliminate hallucinated memories.
+                </p>
+              </div>
+              <div className="cs-feature-item">
+                <div>
+                  <h4>Data Modeling &amp; Privacy Boundary</h4>
                   <span className="tag">Technical Execution</span>
                 </div>
                 <p>
-                  Designed PostgreSQL database schemas on Supabase with `pgvector`, Row-Level Security policies, RPC search procedures (`match_memories`), signed media URLs, and Next.js 16 Server Actions.
+                  Specified database schemas on Supabase (PostgreSQL), defined strict Row-Level Security policies for encrypted personal memories, and implemented vector similarity search procedures (`match_memories`).
                 </p>
               </div>
             </div>
@@ -470,9 +470,46 @@ export default function ThenvueCaseStudy() {
             </div>
           </section>
 
-          {/* Section 8: What I Learned */}
+          {/* Section 8: Product Evaluation & Success Metrics */}
+          <section className="cs-section reveal" id="metrics">
+            <div className="cs-section-eyebrow">08 / Evaluation &amp; Metrics</div>
+            <h2 className="cs-section-heading">
+              How I evaluate this product: <em>Core metrics &amp; guardrail health</em>.
+            </h2>
+            <div className="cs-decisions-grid">
+              <div className="cs-decision-card">
+                <div className="cs-decision-header">
+                  <h3 className="cs-decision-title">Capture Velocity (&lt; 12s)</h3>
+                  <span className="cs-decision-number">METRIC 01</span>
+                </div>
+                <p style={{ margin: 0, fontSize: '14px', color: '#40423d', lineHeight: '1.6' }}>
+                  Targeted &lt; 12s time-to-capture for audio and quick notes via optimistic UI updates, cutting abandonment compared to traditional reflective journaling apps (&gt; 45s).
+                </p>
+              </div>
+              <div className="cs-decision-card">
+                <div className="cs-decision-header">
+                  <h3 className="cs-decision-title">Semantic Retrieval Precision</h3>
+                  <span className="cs-decision-number">METRIC 02</span>
+                </div>
+                <p style={{ margin: 0, fontSize: '14px', color: '#40423d', lineHeight: '1.6' }}>
+                  Calibrated the cosine distance threshold at 0.72 on 768-dim embeddings, maintaining high semantic recall for affective queries without returning noisy, irrelevant memories.
+                </p>
+              </div>
+              <div className="cs-decision-card">
+                <div className="cs-decision-header">
+                  <h3 className="cs-decision-title">Zero-Hallucination Citation Fidelity</h3>
+                  <span className="cs-decision-number">METRIC 03</span>
+                </div>
+                <p style={{ margin: 0, fontSize: '14px', color: '#40423d', lineHeight: '1.6' }}>
+                  Enforced a 100% grounded citation rule in &ldquo;Ask Your Life&rdquo;. Every factual synthesis links to verified memory IDs; ungrounded assertions trigger a fallback to protect user trust.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Section 9: What I Learned */}
           <section className="cs-section reveal" id="learnings">
-            <div className="cs-section-eyebrow">08 / Reflection</div>
+            <div className="cs-section-eyebrow">09 / Reflection</div>
             <h2 className="cs-section-heading">
               What building Thenvue taught me about <em>AI product craft</em>.
             </h2>

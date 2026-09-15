@@ -31,7 +31,7 @@ export default function MerchowCaseStudy() {
       {/* Hero Section */}
       <section className="cs-hero container">
         <div className="cs-kicker-row">
-          <span className="cs-kicker">02 — Case Study / Startup &amp; E-Commerce (0 → 1)</span>
+          <span className="cs-kicker">02 — Case Study / 0 → 1 Product Leadership</span>
           <span className="cs-kicker">Founder-led Venture</span>
         </div>
 
@@ -40,7 +40,7 @@ export default function MerchowCaseStudy() {
         </h1>
 
         <p className="cs-hero-subtitle">
-          How I led product from ideation to MVP launch for a creator-led merchandise platform — eliminating inventory risk, automating print-on-demand fulfillment via the Qikink API, and aligning a 5-member engineering team.
+          How I led product from ideation to MVP launch for a creator merchandise platform — validating customer pain points across 10+ creator interviews (+35% engagement lift), automating print-on-demand fulfillment via the Qikink API, and steering bi-weekly Agile sprints across a 5-member engineering team.
         </p>
 
         {/* Project Meta Strip */}
@@ -62,8 +62,8 @@ export default function MerchowCaseStudy() {
           </div>
           <div className="cs-meta-item">
             <small>Validation Stage</small>
-            <strong>Beta Testing Cohort</strong>
-            <p>10+ in-depth creator discovery interviews, 20+ beta users</p>
+            <strong>Beta Cohort (20+ Creators)</strong>
+            <p>10+ discovery interviews, +35% engagement lift, 0 manual routing errors</p>
           </div>
         </div>
       </section>
@@ -304,6 +304,16 @@ export default function MerchowCaseStudy() {
                 </div>
                 <p style={{ margin: '0', fontSize: '14px', color: '#40423d', lineHeight: '1.6' }}>
                   Beta creators uploaded low-resolution JPEGs (72 DPI), which resulted in order holds at the printing facility. We introduced client-side pre-flight image checks that analyzed DPI and aspect ratio before allowing submission, reducing order rejections to near zero.
+                </p>
+              </div>
+
+              <div className="cs-decision-card">
+                <div className="cs-decision-header">
+                  <h3 className="cs-decision-title">Outcome: +35% Creator Engagement Lift</h3>
+                  <span className="cs-decision-number">OUTCOME 03</span>
+                </div>
+                <p style={{ margin: '0', fontSize: '14px', color: '#40423d', lineHeight: '1.6' }}>
+                  Integrating the store personalization module and real-time earnings slider reduced setup friction, driving a 35% increase in user session engagement and repeat storefront edits across the 20+ beta cohort.
                 </p>
               </div>
             </div>

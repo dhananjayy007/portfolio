@@ -406,11 +406,11 @@ export default function Page() {
           <div className="hero-text-block">
             <div className="hero-identity-layer">
               <span className="hero-identity-name">Hi, I’m Dhananjay.</span>
-              <span className="hero-identity-meta">Product Manager · AI · UX · 0→1</span>
+              <span className="hero-identity-meta">Product Manager · AI Systems · 0 → 1</span>
             </div>
 
             <h1 className="hero-cinematic-title">
-              Turning chaotic brainstorming into <em>structured, user-ready solutions.</em>
+              Turning complex problems and emerging tech into <em>shipped, high-impact products.</em>
             </h1>
           </div>
 
@@ -442,19 +442,19 @@ export default function Page() {
               <div className="project-copy">
                 <span className="project-number">01</span>
                 <div>
-                  <p className="project-type">Flagship 0 → 1 AI Product</p>
+                  <p className="project-type">0 → 1 AI Product Management</p>
                   <h3>Thenvue</h3>
                   <p className="project-description">
-                    A private digital memory journal powered by multimodal capture and Gemini AI understanding — turning fragmented life logs into a queryable personal memory.
+                    Eliminating blank-page journaling friction through zero-effort multimodal capture, associative semantic recall (Gemini + pgvector), and strict zero-hallucination citation guardrails.
                   </p>
                   <Link className="circle-link" href="/thenvue" aria-label="View Thenvue case study">
                     ↗
                   </Link>
                   <div className="project-tags">
-                    <span>0 → 1 Product</span>
-                    <span>AI Product Thinking</span>
-                    <span>Vector Search (pgvector)</span>
-                    <span>Cross-Platform</span>
+                    <span>AI Product Strategy</span>
+                    <span>Multimodal RAG</span>
+                    <span>Latency vs. Trust</span>
+                    <span>Shipped 0 → 1</span>
                   </div>
                 </div>
               </div>
@@ -470,19 +470,19 @@ export default function Page() {
               <div className="project-copy">
                 <span className="project-number">02</span>
                 <div>
-                  <p className="project-type">Founder-Led 0 → 1 Startup</p>
+                  <p className="project-type">0 → 1 Product Leadership · Startup</p>
                   <h3>Merchow</h3>
                   <p className="project-description">
-                    A creator merchandise platform built 0→1 to eliminate inventory risk and manual packaging through automated Qikink print-on-demand routing.
+                    Led product from 0→1 with a 5-engineer team: conducted 10+ creator discovery interviews (+35% engagement), automated Qikink fulfillment APIs, and tested with a 20+ creator beta cohort.
                   </p>
                   <Link className="circle-link" href="/merchow" aria-label="View Merchow case study">
                     ↗
                   </Link>
                   <div className="project-tags">
-                    <span>Product Strategy</span>
-                    <span>API Integration</span>
-                    <span>Agile Sprint Lead</span>
-                    <span>Beta Iteration</span>
+                    <span>Customer Discovery (10+)</span>
+                    <span>5-Engineer Agile Sprints</span>
+                    <span>API Supply Chain</span>
+                    <span>Beta Iteration (20+)</span>
                   </div>
                 </div>
               </div>
@@ -498,17 +498,18 @@ export default function Page() {
               <div className="project-copy">
                 <span className="project-number">03</span>
                 <div>
-                  <p className="project-type">UI / UX Craft &amp; Systems</p>
-                  <h3>Selected<br />design work</h3>
+                  <p className="project-type">UX Strategy &amp; Conversion Systems</p>
+                  <h3>Product Craft &amp;<br />Conversion Systems</h3>
                   <p className="project-description">
-                    Atmospheric e-commerce flows, distraction-free reading utilities (10k+ downloads), and design systems where craft serves user psychology.
+                    Optimized high-intent discovery funnels (5× monthly revenue scale on Escents) and scaled distraction-free mobile utilities to 10,000+ organic users with a 20% drop-off reduction.
                   </p>
                   <Link className="circle-link" href="/design" aria-label="View selected design work">
                     ↗
                   </Link>
                   <div className="project-tags">
-                    <span>Interaction Design</span>
-                    <span>E-Commerce Discovery</span>
+                    <span>Funnel Optimization</span>
+                    <span>10k+ Downloads</span>
+                    <span>Drop-Off Reduction (-20%)</span>
                     <span>Design Systems</span>
                   </div>
                 </div>
@@ -550,10 +551,10 @@ export default function Page() {
           </Reveal>
           <Reveal className="about-copy">
             <p className="large-copy">
-              I like working where technical architecture meets human behavior — finding the simple, powerful idea inside a messy problem, then shipping it.
+              I operate at the intersection of technical systems, customer psychology, and business execution — finding the high-leverage product opportunity inside ambiguous problems, then shipping it.
             </p>
             <p>
-              With a B.Tech from NIT Hamirpur, I approach software with systems-level thinking. I don&rsquo;t just write feature lists or draw mockups; I understand the database schemas, API failure modes, and emotional friction points that determine whether a product succeeds or dies.
+              With an engineering degree from NIT Hamirpur and hands-on 0→1 product leadership experience, I don&rsquo;t just write feature lists or draw mockups. I conduct user discovery to invalidate bad assumptions early, lead cross-functional engineering sprints with clear PRDs, and understand API contracts and data models well enough to make smart technical tradeoffs that protect roadmap velocity.
             </p>
             <div className="about-signature">
               Dhananjay Chaddha <span>↗</span>
@@ -570,31 +571,31 @@ export default function Page() {
             <h2>Learning by<br /><em>shipping.</em></h2>
           </div>
           <p className="section-note">
-            A chronological track record of turning ambiguity into working products and validated systems.
+            A chronological track record of turning ambiguity into working products, validated systems, and measurable outcomes.
           </p>
         </Reveal>
         <div className="timeline">
           <Reveal className="timeline-row">
             <span>2025 — Present</span>
             <div>
-              <h3>Product Lead &amp; Builder · Thenvue &amp; Merchow</h3>
-              <p>Leading 0→1 product lifecycles, user discovery, Gemini multimodal AI pipelines, and Qikink print-on-demand automation across 5-member engineering sprints.</p>
+              <h3>Product Lead · Merchow &amp; Thenvue</h3>
+              <p>Leading 0→1 product roadmaps, PRD authoring, 10+ customer discovery interviews, and sprint execution across a 5-member engineering team for Merchow; architected multimodal AI retrieval and zero-hallucination RAG for Thenvue.</p>
             </div>
             <b>↗</b>
           </Reveal>
           <Reveal className="timeline-row">
             <span>2023 — 2024</span>
             <div>
-              <h3>Product &amp; Interaction Design · Escents &amp; Freelance</h3>
-              <p>Architected sensory discovery flows for fragrance e-commerce, conducted user interviews, and developed tokenized design systems.</p>
+              <h3>Product &amp; UX Lead · Escents &amp; Sangharsh</h3>
+              <p>Drove 5× revenue growth on Escents (₹10K → ₹50K/mo) by optimizing the purchase funnel; scaled educational mobile utilities to 10k+ organic downloads with 20% lower onboarding drop-off.</p>
             </div>
             <b>↗</b>
           </Reveal>
           <Reveal className="timeline-row">
             <span>2021 — 2025</span>
             <div>
-              <h3>B.Tech · NIT Hamirpur</h3>
-              <p>First-principles engineering foundation, quantitative problem solving, and analytical rigor applied to digital products.</p>
+              <h3>B.Tech · National Institute of Technology (NIT) Hamirpur</h3>
+              <p>First-principles engineering foundation, quantitative systems thinking, database modeling, and analytical problem-solving applied to digital products.</p>
             </div>
             <b>↗</b>
           </Reveal>

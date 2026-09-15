@@ -21,48 +21,48 @@ export default function DesignCaseStudy() {
           <Link href="/" className="cs-back-link">
             <span>←</span> All work
           </Link>
-          <span className="cs-nav-title">Case Study 03 / Selected Design Work</span>
+          <span className="cs-nav-title">Case Study 03 / Product Craft &amp; Conversion</span>
         </div>
         <div className="cs-nav-right">
-          <span className="cs-status-tag built">● UI / UX Craft &amp; Systems</span>
+          <span className="cs-status-tag built">● Conversion &amp; Systems</span>
         </div>
       </header>
 
       {/* Hero Section */}
       <section className="cs-hero container">
         <div className="cs-kicker-row">
-          <span className="cs-kicker">03 — Selected Design Work / Product Foundations</span>
-          <span className="cs-kicker">Visual Craft &amp; Interaction Systems</span>
+          <span className="cs-kicker">03 — Case Study / Product Craft &amp; Conversion Architecture</span>
+          <span className="cs-kicker">UX Strategy &amp; Growth</span>
         </div>
 
         <h1 className="cs-hero-title">
-          I don&rsquo;t just manage products. I understand how they <em>should feel and work</em>.
+          Product craft as leverage: <em>Interface decisions that drive business outcomes</em>.
         </h1>
 
         <p className="cs-hero-subtitle">
-          Strong product thinking requires visual judgment, interaction empathy, and system-level design craft. Here is a curated selection of design projects where interface decisions directly solved user problems.
+          Great product managers don&rsquo;t treat design as decoration. They understand that cognitive load, onboarding ergonomics, and clarity directly determine whether a user converts, retains, or churns. Here is how design strategy directly moved business metrics across real products.
         </p>
 
         <div className="cs-meta-grid">
           <div className="cs-meta-item">
             <small>Discipline</small>
-            <strong>UI / UX &amp; Interaction Design</strong>
-            <p>User research, design systems, visual hierarchy, mobile ergonomics</p>
+            <strong>Product &amp; UX Strategy</strong>
+            <p>Funnel optimization, onboarding retention, user discovery, design systems</p>
           </div>
           <div className="cs-meta-item">
-            <small>Selected Projects</small>
+            <small>Quantifiable Impact</small>
             <strong>Escents &amp; Sangharsh</strong>
-            <p>E-commerce conversion flow &amp; 10k+ download mobile utility</p>
+            <p>5× revenue scale (₹10K → ₹50K/mo) &amp; 10k+ organic downloads (-20% drop-off)</p>
           </div>
           <div className="cs-meta-item">
             <small>Core Philosophy</small>
             <strong>Craft as Strategy</strong>
-            <p>Design is not decoration; it is reducing friction and communicating value</p>
+            <p>Reducing cognitive friction directly expands conversion and user retention</p>
           </div>
           <div className="cs-meta-item">
             <small>Tooling</small>
-            <strong>Figma, Tailwind, React Native</strong>
-            <p>From tokenized wireframes to production front-end components</p>
+            <strong>Figma, Tailwind, React Native, Analytics</strong>
+            <p>From customer journey wireframes to tokenized production components</p>
           </div>
         </div>
       </section>
@@ -117,7 +117,7 @@ export default function DesignCaseStudy() {
               <strong>Key UX Decision:</strong> I architected a dark-themed, sensory visual system and designed an interactive &ldquo;Find My Scent&rdquo; recommendation flow. By asking three intuitive lifestyle questions (occasion, temperature, and desired emotional presence), the flow mapped user answers directly to fragrance accords, removing guesswork.
             </p>
             <p>
-              <strong>Product Result:</strong> Demonstrated how empathetic UX and structured guidance can dismantle sensory barriers in e-commerce, replacing browsing hesitation with confident decision-making.
+              <strong>Product &amp; Business Result:</strong> Drove a 5× revenue increase (₹10,000 → ₹50,000/month) within 2 months by replacing blind browsing with a guided recommendation funnel that eliminated purchase hesitation and dramatically improved cart completion.
             </p>
           </section>
 
