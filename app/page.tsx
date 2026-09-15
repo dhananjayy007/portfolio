@@ -642,7 +642,7 @@ export default function Page() {
 
               {/* LinkedIn Connect Card */}
               <a
-                href="https://www.linkedin.com/in/dhananjay-chaddha/"
+                href="https://www.linkedin.com/in/dhananjaychaddha007/"
                 target="_blank"
                 rel="noreferrer"
                 className="contact-card contact-linkedin-card"
@@ -654,7 +654,7 @@ export default function Page() {
                 </div>
                 <div className="contact-card-text">
                   <strong>Connect on LinkedIn</strong>
-                  <span>linkedin.com/in/dhananjay-chaddha</span>
+                  <span>linkedin.com/in/dhananjaychaddha007</span>
                 </div>
                 <span className="contact-card-arrow" aria-hidden="true">↗</span>
               </a>
