@@ -243,14 +243,14 @@ export default function Page() {
     }
 
     // Show initial Easter egg hint once per session if not interacted with
+    let hintTimer: NodeJS.Timeout | null = null
     try {
       const hintDismissed = sessionStorage.getItem('theme-hint-dismissed')
       if (!hintDismissed) {
-        const hintTimer = setTimeout(() => {
+        hintTimer = setTimeout(() => {
           setEasterEggText('💡 You can turn on the lights from here')
           setEasterEggVisible(true)
         }, 1200)
-        return () => clearTimeout(hintTimer)
       }
     } catch {}
 
@@ -285,11 +285,19 @@ export default function Page() {
       document.documentElement.style.setProperty('--mouse-offset-x', `${offsetX}px`)
       document.documentElement.style.setProperty('--mouse-offset-y', `${offsetY}px`)
     }
-    const observer = new IntersectionObserver((entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('is-visible')), { threshold: 0.14 })
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('is-visible')),
+      { threshold: 0.08 }
+    )
     document.querySelectorAll('.reveal').forEach((element) => observer.observe(element))
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('pointermove', onMove, { passive: true })
-    return () => { observer.disconnect(); window.removeEventListener('scroll', onScroll); window.removeEventListener('pointermove', onMove) }
+    return () => {
+      if (hintTimer) clearTimeout(hintTimer)
+      observer.disconnect()
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('pointermove', onMove)
+    }
   }, [])
 
   return (
