@@ -403,6 +403,13 @@ export default function Page() {
             </button>
           </div>
         </nav>
+
+        {/* Floating Capsule Beside Navbar: Get in touch */}
+        <a href="#contact" className="pill-touch-btn" aria-label="Get in touch">
+          <span className="pill-touch-dot" aria-hidden="true" />
+          <span className="pill-touch-text">Get in touch</span>
+          <span className="pill-touch-arrow" aria-hidden="true">↗</span>
+        </a>
       </header>
 
       {/* 3D Cinematic Hero Section: "The 2 AM Thinking Room" */}
