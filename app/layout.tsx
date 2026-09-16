@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Dhananjay Chaddha — AI Product Manager & Builder',
+  title: 'dhananjay- nsn',
   description: 'Product Leader & Builder specializing in 0→1 products, AI workflows, and thoughtful user experiences.',
   icons: {
     icon: [
