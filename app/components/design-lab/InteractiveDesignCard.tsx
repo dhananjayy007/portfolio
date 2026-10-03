@@ -54,7 +54,6 @@ const PROTOTYPES: PrototypeOption[] = [
 
 export default function InteractiveDesignCard() {
   const [activeProto, setActiveProto] = useState<PrototypeId>('coffee-colors')
-  const [isFullscreen, setIsFullscreen] = useState(false)
 
   const activeMeta = PROTOTYPES.find((p) => p.id === activeProto) || PROTOTYPES[0]
 
@@ -113,8 +112,6 @@ export default function InteractiveDesignCard() {
         <DeviceFrame
           title={activeMeta.name}
           category={activeMeta.category}
-          isFullscreen={isFullscreen}
-          onToggleFullscreen={() => setIsFullscreen(!isFullscreen)}
         >
           {activeProto === 'coffee-colors' && <CoffeeColorsShowcase />}
           {activeProto === 'travely' && <TravelyShowcase />}

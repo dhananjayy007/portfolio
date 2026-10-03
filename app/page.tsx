@@ -322,14 +322,9 @@ export default function Page() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState<'work' | 'play' | 'about'>('work')
   const [darkMode, setDarkMode] = useState(true)
-  const [easterEggText, setEasterEggText] = useState<string | null>(null)
-  const [easterEggVisible, setEasterEggVisible] = useState(false)
-  const easterEggTimerRef = useRef<NodeJS.Timeout | null>(null)
   const cursorRef = useRef<HTMLDivElement>(null)
 
   const toggleTheme = () => {
-    const isSwitchingToLight = darkMode
-
     setDarkMode((prev) => {
       const next = !prev
       if (next) {
@@ -341,33 +336,6 @@ export default function Page() {
       }
       return next
     })
-
-    // Handle Easter egg hint & message
-    try {
-      sessionStorage.setItem('theme-hint-dismissed', 'true')
-    } catch {}
-
-    if (easterEggTimerRef.current) {
-      clearTimeout(easterEggTimerRef.current)
-    }
-
-    if (isSwitchingToLight) {
-      setEasterEggText(
-        window.scrollY > 450
-          ? '💡 Dropped the lamp from the ceiling! Scroll up to see the room.'
-          : '💡 Down comes the lamp! Room illuminated.'
-      )
-    } else {
-      setEasterEggText('🌙 Lights out. Back to 2 AM thinking.')
-    }
-    setEasterEggVisible(true)
-
-    easterEggTimerRef.current = setTimeout(() => {
-      setEasterEggVisible(false)
-      setTimeout(() => {
-        setEasterEggText(null)
-      }, 400)
-    }, 4200)
   }
 
   useEffect(() => {
@@ -385,18 +353,6 @@ export default function Page() {
     } catch {
       setDarkMode(document.documentElement.classList.contains('dark'))
     }
-
-    // Show initial Easter egg hint once per session if not interacted with
-    let hintTimer: NodeJS.Timeout | null = null
-    try {
-      const hintDismissed = sessionStorage.getItem('theme-hint-dismissed')
-      if (!hintDismissed) {
-        hintTimer = setTimeout(() => {
-          setEasterEggText('💡 Drop the ceiling lamp from here')
-          setEasterEggVisible(true)
-        }, 1200)
-      }
-    } catch {}
 
     const onScroll = () => {
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight
@@ -437,7 +393,6 @@ export default function Page() {
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('pointermove', onMove, { passive: true })
     return () => {
-      if (hintTimer) clearTimeout(hintTimer)
       observer.disconnect()
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('pointermove', onMove)
@@ -523,17 +478,6 @@ export default function Page() {
                   </svg>
                 )}
               </button>
-
-              {easterEggText && (
-                <div
-                  className={`theme-easter-egg ${easterEggVisible ? 'is-visible' : ''}`}
-                  role="status"
-                  aria-live="polite"
-                >
-                  <span className="theme-easter-egg-arrow" aria-hidden="true" />
-                  <span>{easterEggText}</span>
-                </div>
-              )}
             </div>
 
             <button
