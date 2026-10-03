@@ -1639,9 +1639,13 @@ h4 {
 }
 
 .contact-status-banner.is-success {
-  background: rgba(35, 140, 50, 0.12);
-  border: 1px solid rgba(75, 185, 90, 0.35);
-  color: #a6f296;
+  background: rgba(235, 226, 210, 0.08);
+  border: 1px solid rgba(220, 208, 188, 0.28);
+  color: #ede6d8;
+}
+
+.contact-status-banner.is-success .status-icon {
+  color: #e0d5ba;
 }
 
 .contact-status-banner.is-error {
@@ -1700,7 +1704,7 @@ h4 {
 
 .form-success-note {
   font-size: 13px;
-  color: #a3db68;
+  color: #ede6d8;
   font-weight: 500;
 }
 
