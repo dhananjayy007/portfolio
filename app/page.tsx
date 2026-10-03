@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic'
 const ThinkingWallHero = dynamic(() => import('./components/hero-3d/ThinkingWallHero'), {
   ssr: false,
 })
-import DesignLabSection from './components/design-lab/DesignLabSection'
+import InteractiveDesignCard from './components/design-lab/InteractiveDesignCard'
 
 const skillGroups = [
   ['Product Strategy', '0 → 1 Building', 'PRDs & User Stories', 'Feature Prioritization', 'Fulfillment Workflows'],
@@ -320,7 +320,7 @@ function ContactForm() {
 
 export default function Page() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState<'work' | 'designs' | 'play' | 'about'>('work')
+  const [activeSection, setActiveSection] = useState<'work' | 'play' | 'about'>('work')
   const [darkMode, setDarkMode] = useState(true)
   const [easterEggText, setEasterEggText] = useState<string | null>(null)
   const [easterEggVisible, setEasterEggVisible] = useState(false)
@@ -404,14 +404,11 @@ export default function Page() {
 
       // Dynamic active section detection
       const aboutEl = document.getElementById('about')
-      const designsEl = document.getElementById('designs')
       const workEl = document.getElementById('work')
       const scrollPos = window.scrollY + 280
 
       if (aboutEl && scrollPos >= aboutEl.offsetTop) {
         setActiveSection('about')
-      } else if (designsEl && scrollPos >= designsEl.offsetTop) {
-        setActiveSection('designs')
       } else if (workEl && scrollPos >= workEl.offsetTop) {
         setActiveSection('work')
       } else {
@@ -466,13 +463,6 @@ export default function Page() {
               onClick={() => { setActiveSection('work'); setMenuOpen(false) }}
             >
               Work
-            </a>
-            <a
-              href="#designs"
-              className={`pill-nav-item ${activeSection === 'designs' ? 'is-active' : ''}`}
-              onClick={() => { setActiveSection('designs'); setMenuOpen(false) }}
-            >
-              Designs
             </a>
             <a
               href="#hero"
@@ -689,17 +679,19 @@ export default function Page() {
             </article>
           </Reveal>
 
+          {/* Card 04: Interactive Design Lab & Live Prototypes */}
+          <Reveal>
+            <InteractiveDesignCard />
+          </Reveal>
+
         </div>
       </section>
-
-      {/* Interactive Design Lab */}
-      <DesignLabSection />
 
       {/* About Section */}
       <section className="about-section container" id="about">
         <Reveal className="section-heading">
           <div>
-            <p className="eyebrow">03 / Product Philosophy</p>
+            <p className="eyebrow">02 / Product Philosophy</p>
             <h2>Strategy meets craft.<br /><em>Builder by choice.</em></h2>
           </div>
         </Reveal>
@@ -739,7 +731,7 @@ export default function Page() {
       <section className="experience-section container" id="experience">
         <Reveal className="section-heading">
           <div>
-            <p className="eyebrow">04 / The Path So Far</p>
+            <p className="eyebrow">03 / The Path So Far</p>
             <h2>Learning by<br /><em>shipping.</em></h2>
           </div>
           <p className="section-note">
@@ -778,7 +770,7 @@ export default function Page() {
       <section className="skills-section container">
         <Reveal className="section-heading">
           <div>
-            <p className="eyebrow">05 / The Toolkit</p>
+            <p className="eyebrow">04 / The Toolkit</p>
             <h2>Thinking across<br /><em>the whole stack.</em></h2>
           </div>
         </Reveal>

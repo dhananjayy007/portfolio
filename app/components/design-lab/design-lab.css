@@ -1979,3 +1979,131 @@
   margin-top: 7px;
   flex-shrink: 0;
 }
+
+/* --------------------------------------------------------------------------
+   08. Card 04: Project List Integration (.project-interactive-card)
+   -------------------------------------------------------------------------- */
+.project-interactive-card {
+  grid-template-columns: 34% 66%;
+  min-height: 560px;
+}
+
+@media (max-width: 960px) {
+  .project-interactive-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lab-card-copy {
+  display: flex;
+  flex-direction: column;
+}
+
+.lab-copy-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.lab-copy-content h3 {
+  font-size: 32px;
+  line-height: 1.05;
+}
+
+.lab-copy-content h3 em {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.lab-card-picker {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.picker-title {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.picker-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+@media (max-width: 1200px) and (min-width: 961px) {
+  .picker-buttons {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lab-picker-btn {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  color: var(--foreground);
+}
+
+.lab-picker-btn:hover {
+  border-color: var(--card-hover-border);
+  transform: translateY(-1px);
+}
+
+.lab-picker-btn.is-active {
+  background: var(--foreground);
+  color: var(--background);
+  border-color: var(--foreground);
+}
+
+:root.dark .lab-picker-btn.is-active {
+  background: #2b2e2a;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.picker-num {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.6;
+}
+
+.picker-text strong {
+  display: block;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.picker-text small {
+  display: block;
+  font-size: 9px;
+  opacity: 0.7;
+}
+
+.lab-visual-viewport {
+  padding: 0 !important;
+  background: #0d0f0d;
+}
+
+.lab-visual-viewport .studio-device-shell {
+  border: none;
+  border-radius: 0;
+  height: 100%;
+  box-shadow: none;
+}
+
