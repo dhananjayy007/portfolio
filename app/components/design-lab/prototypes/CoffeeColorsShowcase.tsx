@@ -5,79 +5,103 @@ import React, { useState } from 'react'
 export interface CoffeeTheme {
   id: string
   name: string
+  swatchHex: string
   headline: string
-  subhead: string
+  kicker: string
+  description: string
   buttonLabel: string
   buttonColor: string
   canvasBg: string
   archBg: string
-  badgeColor: string
-  drinkType: 'coffee' | 'tea' | 'chai' | 'dark'
-  swatchHex: string
+  textColor: string
+  descColor: string
+  badgeBg: string
+  imageSrc: string
+  imageAlt: string
+  isArtOfLife?: boolean
 }
 
 export const COFFEE_THEMES: CoffeeTheme[] = [
   {
     id: 'blush-espresso',
     name: 'Blush Espresso',
+    swatchHex: '#f3ddd3',
     headline: 'JUST TAKE A SIP',
-    subhead: 'Rich single-origin espresso with velvet crema, nested in a warm blush architectural arch.',
+    kicker: 'TASTE IT TO BELIEVE IT',
+    description:
+      'Single-origin Ethiopian Yirgacheffe slow-extracted with thick hazelnut crema. Balanced floral notes nested in an architectural recessed arch with roasted whole beans.',
     buttonLabel: 'BE FIRST TO TASTE',
     buttonColor: '#f29938',
     canvasBg: '#f6f3ee',
-    archBg: '#ebdcd3',
-    badgeColor: '#938b82',
-    drinkType: 'coffee',
-    swatchHex: '#ebdcd3',
+    archBg: '#f3ddd3',
+    textColor: '#1c1b18',
+    descColor: '#635e56',
+    badgeBg: '#7e776e',
+    imageSrc: '/images/designs/coffee_cup_beans.jpg',
+    imageAlt: 'Overhead white ceramic coffee cup with crema and roasted beans',
   },
   {
     id: 'sage-matcha',
     name: 'Sage & Matcha',
+    swatchHex: '#bed3c8',
     headline: 'CALM IN A CUP',
-    subhead: 'Ceremonial grade stone-ground matcha with botanical mint leaves and soothing green tones.',
+    kicker: 'CEREMONIAL STONE-GROUND',
+    description:
+      'First-harvest Uji ceremonial matcha whisked to micro-foam perfection. Infused with botanical notes and tranquil alpine mint tones.',
     buttonLabel: 'ORDER FRESH BREW',
-    buttonColor: '#4f8061',
-    canvasBg: '#f0f4f1',
-    archBg: '#cdddd3',
-    badgeColor: '#708878',
-    drinkType: 'tea',
-    swatchHex: '#cdddd3',
+    buttonColor: '#477a5b',
+    canvasBg: '#f1f5f2',
+    archBg: '#bed3c8',
+    textColor: '#19241d',
+    descColor: '#536558',
+    badgeBg: '#5d7564',
+    imageSrc: '/images/designs/coffee_cup_beans.jpg',
+    imageAlt: 'Ceremonial matcha cup with soothing botanical tones',
   },
   {
-    id: 'terracotta-chai',
+    id: 'terracotta-roast',
     name: 'Terracotta Clay',
+    swatchHex: '#c99b8d',
     headline: 'ARTISANAL ROAST',
-    subhead: 'Slow-roasted Kenyan peaberry with cinnamon bark accents and warm desert terracotta warmth.',
+    kicker: 'SLOW FIRED PEABERRY',
+    description:
+      'Sun-dried Kenyan peaberry with cinnamon bark accents, slow-roasted over fruitwood coals. Earthy warmth meeting velvety mouthfeel.',
     buttonLabel: 'EXPLORE FLAVORS',
-    buttonColor: '#d1573c',
-    canvasBg: '#f8f3ef',
-    archBg: '#e5bfb3',
-    badgeColor: '#9b6a5e',
-    drinkType: 'chai',
-    swatchHex: '#e5bfb3',
+    buttonColor: '#cf5a3c',
+    canvasBg: '#faf4ef',
+    archBg: '#e8c4b8',
+    textColor: '#291b17',
+    descColor: '#70534b',
+    badgeBg: '#8c594d',
+    imageSrc: '/images/designs/coffee_cup_beans.jpg',
+    imageAlt: 'Artisanal peaberry roast with whole beans',
   },
   {
     id: 'slate-art-of-life',
     name: 'Slate "Art of Life"',
+    swatchHex: '#3d3a39',
     headline: 'ART OF LIFE',
-    subhead: 'Minimalist evening steep: porcelain teapot infusion with dark basalt stone aesthetics.',
+    kicker: 'CEREMONIAL INFUSION',
+    description:
+      'Porcelain teapot infusion of loose organic green tea leaves, paired with fresh garden mint on natural basalt slate. Minimalist evening steep.',
     buttonLabel: 'TASTE MASTERY',
     buttonColor: '#dfad62',
-    canvasBg: '#1b1d1c',
-    archBg: '#353735',
-    badgeColor: '#585955',
-    drinkType: 'dark',
-    swatchHex: '#353735',
+    canvasBg: '#232120',
+    archBg: '#3d3a39',
+    textColor: '#f5f3f0',
+    descColor: '#a6a19c',
+    badgeBg: '#54504e',
+    imageSrc: '/images/designs/tea_art_of_life.jpg',
+    imageAlt: 'White porcelain teapot with fresh mint leaves and golden tea cup',
+    isArtOfLife: true,
   },
 ]
 
 export default function CoffeeColorsShowcase() {
   const [activeTheme, setActiveTheme] = useState<CoffeeTheme>(COFFEE_THEMES[0])
   const [ripples, setRipples] = useState<number[]>([])
-  const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [pullOffset, setPullOffset] = useState(0)
-
-  const isDark = activeTheme.id === 'slate-art-of-life'
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
 
   const handleCupClick = () => {
     const id = Date.now()
@@ -87,182 +111,165 @@ export default function CoffeeColorsShowcase() {
     }, 1200)
   }
 
-  const handleCtaClick = () => {
-    setToastMessage(`☕ ${activeTheme.name} order added to tasting flight!`)
-    setTimeout(() => {
-      setToastMessage(null)
-    }, 2800)
+  const handlePullTab = () => {
+    setPullOffset(28)
+    setTimeout(() => setPullOffset(0), 380)
   }
 
-  const handlePullTab = () => {
-    setPullOffset(24)
-    setTimeout(() => setPullOffset(0), 400)
+  const handleOrder = () => {
+    setToastMessage(`✓ ${activeTheme.name} added to tasting flight!`)
+    setTimeout(() => setToastMessage(null), 2600)
   }
 
   return (
     <div
-      className={`coffee-showcase-container ${isDark ? 'is-dark-theme' : ''}`}
+      className={`coffee-canvas ${activeTheme.isArtOfLife ? 'is-art-of-life' : ''}`}
       style={{
         backgroundColor: activeTheme.canvasBg,
-        transition: 'background-color 0.4s ease',
+        color: activeTheme.textColor,
+        transition: 'background-color 0.45s cubic-bezier(0.16, 1, 0.3, 1)',
       }}
     >
       {/* Top Prototype Navigation */}
-      <header className="coffee-proto-nav">
-        <div className="coffee-proto-logo">
-          <span className="logo-text">BREW LAB</span>
+      <header className="coffee-header">
+        <div className="coffee-brand">
+          <span className="coffee-brand-logo">LOGO</span>
         </div>
 
-        {/* Signature Interactive Hanging Pull-Tab Badge from Figma */}
+        {/* Signature Figma Hanging Pull Tab Badge */}
         <div
-          className="coffee-hanging-tab"
-          onClick={handlePullTab}
+          className="coffee-hanging-badge"
           style={{
-            backgroundColor: activeTheme.badgeColor,
-            transform: `translateY(${pullOffset}px)`,
-            transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.4s ease',
+            backgroundColor: activeTheme.badgeBg,
+            transform: `translate(-50%, ${pullOffset}px)`,
+            transition: 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.45s ease',
           }}
+          onClick={handlePullTab}
           title="Click to pull badge"
         >
-          <span className="tab-pill" />
-          <span className="tab-icon">↓</span>
+          <span className="badge-pill-slit" />
+          <span className="badge-label">
+            {activeTheme.isArtOfLife ? 'TEA' : 'COFFEE'}
+          </span>
+          <span className="badge-arrow">↓</span>
         </div>
 
-        <div className="coffee-proto-links">
-          <span>ORIGIN</span>
-          <span>ROASTS</span>
-          <span>MENU</span>
-        </div>
+        <nav className="coffee-nav-menu">
+          <span className="is-active">Home</span>
+          <span>About Us</span>
+          <span>Our Menu</span>
+          <span>Contact Us</span>
+        </nav>
       </header>
 
-      {/* Main Hero Layout */}
-      <div className="coffee-proto-body">
-        {/* Left Column: Typography & Action */}
-        <div className="coffee-text-column">
-          <span className="coffee-kicker">SMALL BATCH // ZERO ADDITIVES</span>
-          <h2 className="coffee-headline">{activeTheme.headline}</h2>
-          <p className="coffee-description">{activeTheme.subhead}</p>
+      {/* Main Hero Body */}
+      <div className="coffee-hero-body">
+        {/* Left Column: Typography, Swatches & CTA */}
+        <div className="coffee-copy-col">
+          <div className="coffee-swatch-bar">
+            <span className="swatch-label">PALETTE SYSTEM</span>
+            <div className="swatch-list">
+              {COFFEE_THEMES.map((theme) => {
+                const isActive = theme.id === activeTheme.id
+                return (
+                  <button
+                    key={theme.id}
+                    type="button"
+                    className={`coffee-swatch-chip ${isActive ? 'is-active' : ''}`}
+                    onClick={() => setActiveTheme(theme)}
+                    title={theme.name}
+                  >
+                    <span
+                      className="swatch-circle"
+                      style={{ backgroundColor: theme.swatchHex }}
+                    />
+                    <span className="swatch-name">{theme.name}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
 
-          <div className="coffee-action-row">
+          <div className="coffee-title-lockup">
+            <span
+              className="coffee-kicker"
+              style={{ color: activeTheme.descColor }}
+            >
+              {activeTheme.kicker}
+            </span>
+            <h1 className="coffee-display-title">{activeTheme.headline}</h1>
+            <p
+              className="coffee-body-text"
+              style={{ color: activeTheme.descColor }}
+            >
+              {activeTheme.description}
+            </p>
+          </div>
+
+          <div className="coffee-cta-group">
             <button
               type="button"
-              className="coffee-cta-btn"
-              onClick={handleCtaClick}
-              style={{
-                backgroundColor: activeTheme.buttonColor,
-              }}
+              className="coffee-order-btn"
+              onClick={handleOrder}
+              style={{ backgroundColor: activeTheme.buttonColor }}
             >
               {activeTheme.buttonLabel}
             </button>
-            <span className="coffee-price-tag">₹340 / cup</span>
+            <span
+              className="coffee-craft-tag"
+              style={{ color: activeTheme.descColor }}
+            >
+              Small Batch · Zero Additives
+            </span>
           </div>
 
-          {/* Color Palette Switcher from Figma Top-Left */}
-          <div className="coffee-palette-picker">
-            <span className="picker-label">FIGMA PALETTES:</span>
-            <div className="swatch-row">
-              {COFFEE_THEMES.map((theme) => (
-                <button
-                  key={theme.id}
-                  type="button"
-                  className={`swatch-pill ${activeTheme.id === theme.id ? 'is-active' : ''}`}
-                  onClick={() => setActiveTheme(theme)}
-                  title={`Switch to ${theme.name}`}
-                >
-                  <span
-                    className="swatch-color-dot"
-                    style={{ backgroundColor: theme.swatchHex }}
-                  />
-                  <span className="swatch-text">{theme.name}</span>
-                </button>
-              ))}
+          {toastMessage && (
+            <div className="coffee-toast-feedback">
+              <span>{toastMessage}</span>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Right Column: Architectural Arched Cutout & Interactive Cup */}
-        <div className="coffee-visual-column">
+        {/* Right Column: Architectural Arch Cutout with Real Photo & Physics */}
+        <div className="coffee-stage-col">
           <div
-            className="coffee-arch-stage"
+            className={`coffee-arch-stage ${activeTheme.isArtOfLife ? 'is-horizontal-stage' : ''}`}
             style={{
               backgroundColor: activeTheme.archBg,
-              transition: 'background-color 0.4s ease',
+              transition: 'background-color 0.45s ease',
             }}
           >
-            {/* Interactive Cup with Ripple & Steam */}
+            {/* Real Photographic Still Life */}
             <div
-              className="coffee-cup-interactive"
+              className="coffee-image-wrapper"
               onClick={handleCupClick}
-              title="Click the cup to ripple"
+              title="Click the cup to trigger liquid ripple physics"
             >
-              {/* Cup Saucer */}
-              <div className="coffee-saucer">
-                {/* Porcelain Cup Body */}
-                <div className="coffee-cup-rim">
-                  {/* Brew Liquid */}
-                  <div
-                    className={`coffee-liquid ${
-                      activeTheme.drinkType === 'tea'
-                        ? 'is-tea'
-                        : activeTheme.drinkType === 'chai'
-                        ? 'is-chai'
-                        : activeTheme.drinkType === 'dark'
-                        ? 'is-dark-brew'
-                        : 'is-espresso'
-                    }`}
-                  >
-                    {/* Expanding ripples on click */}
-                    {ripples.map((id) => (
-                      <span key={id} className="coffee-ripple" />
-                    ))}
-                    {/* Subtle crema sheen */}
-                    <div className="coffee-crema-glint" />
-                  </div>
-                </div>
+              <img
+                src={activeTheme.imageSrc}
+                alt={activeTheme.imageAlt}
+                className="coffee-stage-photo"
+              />
 
-                {/* Cup Handle */}
-                <div className="coffee-cup-handle" />
-              </div>
+              {/* Liquid Ripple Overlay Effect on click */}
+              {ripples.map((ripId) => (
+                <span key={ripId} className="espresso-ripple-ring" />
+              ))}
 
-              {/* Steam Puffs */}
-              <div className="steam-container" aria-hidden="true">
-                <span className="steam-puff steam-1" />
-                <span className="steam-puff steam-2" />
-                <span className="steam-puff steam-3" />
+              {/* Rising Aroma Particle Steam */}
+              <div className="coffee-steam-emitter" aria-hidden="true">
+                <span className="steam-line steam-1" />
+                <span className="steam-line steam-2" />
+                <span className="steam-line steam-3" />
               </div>
             </div>
 
-            {/* Scattered Roasted Beans / Botanical Garnish at Base of Arch */}
-            <div className="coffee-beans-bed" aria-hidden="true">
-              {activeTheme.drinkType === 'tea' ? (
-                <>
-                  <span className="botanical-leaf leaf-1">🍃</span>
-                  <span className="botanical-leaf leaf-2">🌿</span>
-                  <span className="botanical-leaf leaf-3">🍃</span>
-                  <span className="botanical-leaf leaf-4">🌿</span>
-                </>
-              ) : (
-                <>
-                  <span className="coffee-bean bean-1" />
-                  <span className="coffee-bean bean-2" />
-                  <span className="coffee-bean bean-3" />
-                  <span className="coffee-bean bean-4" />
-                  <span className="coffee-bean bean-5" />
-                  <span className="coffee-bean bean-6" />
-                  <span className="coffee-bean bean-7" />
-                </>
-              )}
+            <div className="arch-hint-pill">
+              <span>● Click cup to brew</span>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Interactive Toast Confirmation */}
-      {toastMessage && (
-        <div className="coffee-toast-pill" role="status">
-          <span>{toastMessage}</span>
-        </div>
-      )}
     </div>
   )
 }

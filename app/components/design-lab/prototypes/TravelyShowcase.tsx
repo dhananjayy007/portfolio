@@ -2,326 +2,273 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 
-interface Destination {
+interface TravelCard {
   id: string
-  name: string
-  region: string
+  title: string
   elevation: string
-  temp: string
-  coordinates: string
-  bestSeason: string
-  description: string
-  cards: {
-    title: string
-    subtitle: string
-    tag: string
-    image: string
-  }[]
+  region: string
+  image: string
+  caption: string
 }
 
-const DESTINATIONS: Destination[] = [
+const CARDS: TravelCard[] = [
   {
-    id: 'himalayas',
-    name: 'HIMALAYAS',
-    region: 'Himachal & Uttarakhand',
-    elevation: '6,153 m',
-    temp: '-4°C',
-    coordinates: '31.1048° N, 77.1734° E',
-    bestSeason: 'May — Oct',
-    description:
-      'The sacred Himalayan spine separating the plains of the Indian subcontinent from the Tibetan Plateau, where glacial alpine tarns mirror jagged granite needles.',
-    cards: [
-      {
-        title: 'Chandratal Tarn',
-        subtitle: 'Crescent Moon Lake at 4,250m',
-        tag: 'Camp Base',
-        image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
-      },
-      {
-        title: 'Prayer Flags Pass',
-        subtitle: 'Wind-blown Buddhist mantras at 4,890m',
-        tag: 'Sacred Pass',
-        image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80',
-      },
-      {
-        title: 'Baralacha Ridge',
-        subtitle: 'High-altitude junction of Zanskar & Spiti',
-        tag: 'Alpine Traverse',
-        image: 'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?auto=format&fit=crop&w=800&q=80',
-      },
-    ],
+    id: 'flags',
+    title: 'Prayer Flags Pass',
+    elevation: '4,890 m',
+    region: 'Zanskar Traverse',
+    image: '/images/designs/travely_prayer_flags.jpg',
+    caption: 'Ancient Buddhist mantras fluttering over freezing glacial torrents.',
   },
   {
-    id: 'ladakh',
-    name: 'LADAKH',
-    region: 'Trans-Himalayan Cold Desert',
-    elevation: '5,359 m',
-    temp: '-8°C',
-    coordinates: '34.1526° N, 77.5771° E',
-    bestSeason: 'Jun — Sep',
-    description:
-      'Land of high passes, ancient cliff-hanging gompas, and stark mineral mountains framed against deep cobalt skies.',
-    cards: [
-      {
-        title: 'Pangong Tso',
-        subtitle: 'Endorheic saltwater lake changing cyan hues',
-        tag: 'Shoreline',
-        image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
-      },
-      {
-        title: 'Khardung La',
-        subtitle: 'Gateway to the Shyok and Nubra valleys',
-        tag: '5,359m Pass',
-        image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80',
-      },
-      {
-        title: 'Diskit Monastery',
-        subtitle: '106-foot Maitreya Buddha facing desert dunes',
-        tag: 'Sanctuary',
-        image: 'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?auto=format&fit=crop&w=800&q=80',
-      },
-    ],
+    id: 'lake',
+    title: 'Chandratal Reflection',
+    elevation: '4,250 m',
+    region: 'Spiti Valley',
+    image: '/images/designs/travely_himalayas_lake.jpg',
+    caption: 'Crescent tarn mirroring jagged granite needles under twilight dusk.',
   },
   {
-    id: 'spiti',
-    name: 'SPITI VALLEY',
-    region: 'Middle Land / High Altitude',
-    elevation: '4,270 m',
-    temp: '-11°C',
-    coordinates: '32.2461° N, 78.0349° E',
-    bestSeason: 'Jul — Sep',
-    description:
-      'A timeless high-altitude enclave carved by the Spiti River, where thousand-year-old mudbrick monasteries cling to barren scree slopes.',
-    cards: [
-      {
-        title: 'Key Monastery',
-        subtitle: 'Fortress-style Tibetan Buddhist retreat',
-        tag: 'Historic 11th C.',
-        image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80',
-      },
-      {
-        title: 'Hikkim Post Office',
-        subtitle: 'Highest operational post office on Earth',
-        tag: '4,440m Altitude',
-        image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
-      },
-      {
-        title: 'Langza Fossil Village',
-        subtitle: 'Ancient Tethys Sea marine ammonites',
-        tag: 'Geological Wonder',
-        image: 'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?auto=format&fit=crop&w=800&q=80',
-      },
-    ],
+    id: 'ridge',
+    title: 'Chanshal Alpine Crest',
+    elevation: '4,520 m',
+    region: 'Himachal Border',
+    image: '/images/chandranahan.jpg',
+    caption: 'High mountain meadows blanketed in first autumn snowfall.',
   },
 ]
 
 export default function TravelyShowcase() {
-  const [activeDest, setActiveDest] = useState<Destination>(DESTINATIONS[0])
+  const [viewMode, setViewMode] = useState<'panorama' | 'carousel'>('panorama')
   const [activeCardIndex, setActiveCardIndex] = useState(0)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [bookedToast, setBookedToast] = useState<string | null>(null)
+  const [activeNavTab, setActiveNavTab] = useState('Overlook')
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  // Interactive Particle Snow & Mist Canvas
+  // Real-time atmospheric particle snowfall/mist simulation
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    let animId: number
-    const w = (canvas.width = canvas.parentElement?.clientWidth || 800)
-    const h = (canvas.height = canvas.parentElement?.clientHeight || 500)
+    let animationFrameId: number
+    let width = (canvas.width = canvas.parentElement?.clientWidth || 800)
+    let height = (canvas.height = canvas.parentElement?.clientHeight || 600)
 
-    const particles: { x: number; y: number; r: number; speedY: number; speedX: number; opacity: number }[] = []
-    for (let i = 0; i < 45; i++) {
-      particles.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        r: Math.random() * 2.2 + 0.6,
-        speedY: Math.random() * 0.45 + 0.2,
-        speedX: (Math.random() - 0.5) * 0.3,
-        opacity: Math.random() * 0.6 + 0.2,
-      })
+    const particles = Array.from({ length: 48 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      radius: Math.random() * 2 + 0.6,
+      speedY: Math.random() * 0.7 + 0.3,
+      speedX: (Math.random() - 0.5) * 0.4,
+      opacity: Math.random() * 0.65 + 0.25,
+    }))
+
+    const handleResize = () => {
+      if (!canvas) return
+      width = canvas.width = canvas.parentElement?.clientWidth || 800
+      height = canvas.height = canvas.parentElement?.clientHeight || 600
     }
+    window.addEventListener('resize', handleResize)
 
     const render = () => {
-      ctx.clearRect(0, 0, w, h)
-      ctx.fillStyle = '#ffffff'
-      particles.forEach((p) => {
-        ctx.globalAlpha = p.opacity
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
-        ctx.fill()
+      ctx.clearRect(0, 0, width, height)
 
+      particles.forEach((p) => {
         p.y += p.speedY
         p.x += p.speedX
-        if (p.y > h) p.y = -5
-        if (p.x > w) p.x = 0
-        if (p.x < 0) p.x = w
+        if (p.y > height) {
+          p.y = -5
+          p.x = Math.random() * width
+        }
+        if (p.x > width) p.x = 0
+        if (p.x < 0) p.x = width
+
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.4)'
+        ctx.shadowBlur = 4
+        ctx.fill()
       })
-      animId = requestAnimationFrame(render)
+
+      animationFrameId = requestAnimationFrame(render)
     }
+
     render()
 
-    return () => cancelAnimationFrame(animId)
-  }, [activeDest])
+    return () => {
+      cancelAnimationFrame(animationFrameId)
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
 
-  const handleNextCard = () => {
-    setActiveCardIndex((prev) => (prev + 1) % activeDest.cards.length)
+  const nextCard = () => {
+    setActiveCardIndex((prev) => (prev + 1) % CARDS.length)
   }
 
-  const handleBookExpedition = () => {
-    const currentCard = activeDest.cards[activeCardIndex]
-    setBookedToast(`🏔️ Expedition to ${currentCard.title} reserved!`)
-    setTimeout(() => setBookedToast(null), 3000)
+  const prevCard = () => {
+    setActiveCardIndex((prev) => (prev - 1 + CARDS.length) % CARDS.length)
   }
 
   return (
-    <div className="travely-container">
-      {/* Background Mountain Lake Visual */}
-      <div className="travely-hero-backdrop">
-        <picture>
-          <img
-            src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80"
-            alt="Himalayan Mountain Reflection"
-            className="travely-backdrop-img"
-          />
-        </picture>
-        <div className="travely-vignette-overlay" />
-        <canvas ref={canvasRef} className="travely-particle-canvas" aria-hidden="true" />
+    <div className={`travely-container view-${viewMode}`}>
+      {/* Background Photography Layer */}
+      <div className="travely-backdrop-layer">
+        <img
+          src="/images/designs/travely_himalayas_lake.jpg"
+          alt="Himalayan alpine lake reflection"
+          className="travely-backdrop-img"
+        />
+        <div className="travely-backdrop-darkener" />
       </div>
 
-      {/* Navigation Bar */}
+      {/* Falling Snowfall Canvas Layer */}
+      <canvas ref={canvasRef} className="travely-particles-canvas" />
+
+      {/* Top Prototype Navigation from Figma */}
       <header className="travely-nav">
         <div className="travely-logo">
-          <span>TRAVELY</span>
+          <span>LOGO</span>
         </div>
 
-        <div className="travely-nav-actions">
-          <button type="button" className="travely-icon-btn" title="Search destinations">
-            🔍
+        {/* View Switcher Toggle Pill */}
+        <div className="travely-mode-pill">
+          <button
+            type="button"
+            className={viewMode === 'panorama' ? 'is-active' : ''}
+            onClick={() => setViewMode('panorama')}
+          >
+            Panorama
           </button>
           <button
             type="button"
-            className="travely-menu-btn"
-            onClick={() => setMenuOpen(!menuOpen)}
+            className={viewMode === 'carousel' ? 'is-active' : ''}
+            onClick={() => setViewMode('carousel')}
           >
-            <span>{menuOpen ? '✕' : 'MENU'}</span>
+            3D Cards
           </button>
+        </div>
+
+        <div className="travely-nav-actions">
+          <span className="nav-icon" title="Search">🔍</span>
+          <span className="nav-counter">27 / 10</span>
+          <span className="nav-hamburger">☰</span>
         </div>
       </header>
 
-      {/* Main Showcase Layout */}
-      <div className="travely-body">
-        {/* Left Column: Big Atmospheric Title & Destination Info */}
-        <div className="travely-info-column">
-          <div className="travely-meta-row">
-            <span className="travely-region-badge">{activeDest.region}</span>
-            <span className="travely-coord">{activeDest.coordinates}</span>
-          </div>
-
-          <h2 className="travely-big-title">{activeDest.name}</h2>
-
-          <p className="travely-summary">{activeDest.description}</p>
-
-          <div className="travely-metrics-strip">
-            <div className="metric-box">
-              <span className="metric-lbl">PEAK ELEVATION</span>
-              <strong className="metric-val">{activeDest.elevation}</strong>
-            </div>
-            <div className="metric-box">
-              <span className="metric-lbl">CURRENT TEMP</span>
-              <strong className="metric-val">{activeDest.temp}</strong>
-            </div>
-            <div className="metric-box">
-              <span className="metric-lbl">OPTIMAL WINDOW</span>
-              <strong className="metric-val">{activeDest.bestSeason}</strong>
-            </div>
-          </div>
-
-          <div className="travely-cta-row">
+      {/* VIEW 1: HERO PANORAMA with MASSIVE HIMALAYAS DISPLAY TEXT */}
+      {viewMode === 'panorama' ? (
+        <div className="travely-panorama-view">
+          <div className="travely-center-headline-lockup">
+            <span className="travely-overhead-kicker">EXPEDITIONS // 2025</span>
+            <h1 className="travely-giant-title">HIMALAYAS</h1>
+            <p className="travely-panorama-sub">
+              Over 100 peaks exceeding 7,200 meters. Mirror lakes, prayer flags, and untouched alpine silence.
+            </p>
             <button
               type="button"
-              className="travely-explore-btn"
-              onClick={handleBookExpedition}
+              className="travely-explore-cta"
+              onClick={() => setViewMode('carousel')}
             >
-              Plan Expedition ↗
+              Explore 3D Expedition Cards →
             </button>
           </div>
+
+          {/* Bottom Tabs from Figma Bottom Bar */}
+          <footer className="travely-bottom-bar">
+            {['Overlook', 'Atmosphere', 'Stories', 'More'].map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                className={`travely-tab-item ${activeNavTab === tab ? 'is-active' : ''}`}
+                onClick={() => setActiveNavTab(tab)}
+              >
+                {tab}
+              </button>
+            ))}
+          </footer>
         </div>
+      ) : (
+        /* VIEW 2: 3D CARD CAROUSEL (Figma Screen 2) */
+        <div className="travely-carousel-view">
+          {/* Left Column: Editorial Info */}
+          <div className="travely-info-col">
+            <div className="travely-menu-indicator">
+              <span>MENU :</span>
+            </div>
+            <div className="travely-editorial-text">
+              <p>
+                The Himalayas, or Himalaya, is a mountain range in Asia, separating the plains of the Indian subcontinent from the Tibetan Plateau. The range has some of the planet&apos;s highest peaks, including the very highest, Mount Everest.
+              </p>
+              <div className="travely-metrics-badge">
+                <div>
+                  <small>ELEVATION</small>
+                  <b>{CARDS[activeCardIndex].elevation}</b>
+                </div>
+                <div>
+                  <small>TEMP</small>
+                  <b>-6°C</b>
+                </div>
+                <div>
+                  <small>REGION</small>
+                  <b>{CARDS[activeCardIndex].region}</b>
+                </div>
+              </div>
+            </div>
 
-        {/* Right Column: Interactive 3D Layered Card Stack */}
-        <div className="travely-cards-column">
-          <div className="travely-stack-wrapper" onClick={handleNextCard} title="Click to cycle next destination card">
-            {activeDest.cards.map((card, idx) => {
-              const offset = (idx - activeCardIndex + activeDest.cards.length) % activeDest.cards.length
-              const isFront = offset === 0
+            <div className="travely-carousel-controls">
+              <button
+                type="button"
+                onClick={prevCard}
+                className="carousel-arrow"
+                aria-label="Previous card"
+              >
+                ←
+              </button>
+              <span className="carousel-step">
+                0{activeCardIndex + 1} / 0{CARDS.length}
+              </span>
+              <button
+                type="button"
+                onClick={nextCard}
+                className="carousel-arrow"
+                aria-label="Next card"
+              >
+                →
+              </button>
+            </div>
+          </div>
 
-              let style: React.CSSProperties = {}
-              if (isFront) {
-                style = {
-                  transform: 'translate3d(0, 0, 0) scale(1)',
-                  zIndex: 10,
-                  opacity: 1,
-                  boxShadow: '0 24px 48px -12px rgba(0, 0, 0, 0.7)',
-                }
-              } else if (offset === 1) {
-                style = {
-                  transform: 'translate3d(36px, 12px, -30px) scale(0.92)',
-                  zIndex: 8,
-                  opacity: 0.85,
-                  filter: 'brightness(0.85)',
-                }
-              } else {
-                style = {
-                  transform: 'translate3d(70px, 24px, -60px) scale(0.85)',
-                  zIndex: 6,
-                  opacity: 0.65,
-                  filter: 'brightness(0.7)',
-                }
-              }
+          {/* Right Column: 3D Layered Cards Stack */}
+          <div className="travely-cards-stage">
+            {CARDS.map((card, idx) => {
+              const diff = (idx - activeCardIndex + CARDS.length) % CARDS.length
+              let cardClass = 'card-back'
+              if (diff === 0) cardClass = 'card-active'
+              else if (diff === 1) cardClass = 'card-next'
+              else if (diff === CARDS.length - 1) cardClass = 'card-prev'
 
               return (
-                <div key={card.title} className="travely-card-item" style={style}>
-                  <img src={card.image} alt={card.title} className="card-thumb" />
-                  <div className="card-glass-panel">
-                    <span className="card-tag">{card.tag}</span>
+                <div
+                  key={card.id}
+                  className={`travely-stacked-card ${cardClass}`}
+                  onClick={() => setActiveCardIndex(idx)}
+                >
+                  <img
+                    src={card.image}
+                    alt={card.title}
+                    className="card-media-img"
+                  />
+                  <div className="card-glass-info">
+                    <span className="card-elevation-pill">{card.elevation}</span>
                     <h3 className="card-title">{card.title}</h3>
-                    <p className="card-sub">{card.subtitle}</p>
-                    <div className="card-click-hint">Click to flip card →</div>
+                    <p className="card-caption">{card.caption}</p>
                   </div>
                 </div>
               )
             })}
           </div>
-
-          {/* Destination Switcher Pills */}
-          <div className="travely-destination-bar">
-            <span className="bar-label">EXPLORE REGION:</span>
-            <div className="destination-pills">
-              {DESTINATIONS.map((d) => (
-                <button
-                  key={d.id}
-                  type="button"
-                  className={`dest-pill ${activeDest.id === d.id ? 'is-active' : ''}`}
-                  onClick={() => {
-                    setActiveDest(d)
-                    setActiveCardIndex(0)
-                  }}
-                >
-                  {d.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Confirmation Toast */}
-      {bookedToast && (
-        <div className="travely-toast" role="status">
-          <span>{bookedToast}</span>
         </div>
       )}
     </div>

@@ -3,7 +3,6 @@
 import React, { useState } from 'react'
 import { PrototypeId, PrototypeMeta } from './types'
 import DeviceFrame from './shared/DeviceFrame'
-import DesignTokenDrawer from './shared/DesignTokenDrawer'
 import CoffeeColorsShowcase from './prototypes/CoffeeColorsShowcase'
 import TravelyShowcase from './prototypes/TravelyShowcase'
 import RealEstateShowcase from './prototypes/RealEstateShowcase'
@@ -13,28 +12,16 @@ export const PROTOTYPES_REGISTRY: PrototypeMeta[] = [
   {
     id: 'coffee-colors',
     title: 'Coffee Colors // Just Take a Sip',
-    subtitle: 'Artisanal beverage brand with real-time thematic color systems & tactile stage physics',
-    category: 'E-Commerce · Theming Engine',
+    subtitle: 'Artisanal beverage brand with real-time thematic color systems & recessed arch depth',
+    category: 'Brand Experience · Theming Engine',
     year: '2025',
-    figmaUrl: 'https://www.figma.com/proto/asNo9p6jc4X1SZ7mcYIFMC/coffee-colors?node-id=1-3',
     description:
-      'A study in dynamic brand expression. Features an architectural arched depth stage, overhead beverage ripples, interactive steam micro-physics, and a live 4-palette switcher (Blush Espresso, Sage Matcha, Terracotta, and Slate Dark Roast).',
+      'An exploration of dynamic brand palettes and tactile spatial depth. Features an architectural recessed arch carved into the surface, whole roasted coffee beans, an interactive espresso cup with liquid ripple micro-physics, and a live 4-palette switcher (Blush Espresso, Sage Matcha, Terracotta, and Slate "Art of Life").',
     highlights: [
-      'Live 4-theme palette switcher with instant canvas re-tinting',
-      'Architectural recessed arch with multi-layered inner drop-shadows',
-      'Tactile interactive cup ripple micro-physics & animated steam',
-      'Pullable hanging leather tab badge & spring-action CTA',
-    ],
-    tokens: [
-      { name: 'Canvas Cream', value: '#f6f3ee', type: 'color' },
-      { name: 'Blush Inset', value: '#ebdcd3', type: 'color' },
-      { name: 'Sage Green', value: '#cdddd3', type: 'color' },
-      { name: 'Terracotta Accent', value: '#e5bfb3', type: 'color' },
-      { name: 'Dark Roast Slate', value: '#353735', type: 'color' },
-      { name: 'Amber Roast CTA', value: '#f29938', type: 'color' },
-      { name: 'Headline Serif', value: 'Georgia, serif (Display 38px)', type: 'typography' },
-      { name: 'Mono Kickers', value: 'ui-monospace, monospace (11px)', type: 'typography' },
-      { name: 'Arch Border Radius', value: '180px 180px 12px 12px', type: 'radius' },
+      'Authentic 4-palette switcher with harmonious brand tokens (Blush, Mint, Sage, Terracotta, Slate)',
+      'Architectural recessed arch with realistic multi-layered inner drop-shadows',
+      'Tactile interactive cup ripple micro-physics & animated rising steam',
+      'Interactive hanging pull-tab badge with realistic spring-back physics',
     ],
   },
   {
@@ -43,95 +30,53 @@ export const PROTOTYPES_REGISTRY: PrototypeMeta[] = [
     subtitle: 'Atmospheric travel platform with interactive mountain particle canvas & 3D card stacks',
     category: 'Travel Discovery · 3D Motion',
     year: '2025',
-    figmaUrl: 'https://www.figma.com/proto/d0OE0gLJHsvId8bXhilmcm/travely?node-id=5-78',
     description:
-      'Immersive dark-sky travel exploration featuring a real-time particle snow & mist simulation, stacked 3D destination photography that cycles with spring physics, and dynamic altitude metrics for trans-Himalayan passes.',
+      'Immersive dark-sky travel exploration featuring a real-time particle snowfall simulation over crystal-still glacial lakes, dual viewport modes (Hero Lake Panorama with massive condensed display typography vs. 3D perspective stacked cards), and live mountain pass metrics.',
     highlights: [
-      'Interactive particle mist & snowfall reacting across 45 nodes',
+      'Dual viewports: Panoramic lake reflection with massive Bebas Neue typography vs. 3D Card stack',
+      'Real-time 48-node particle snowfall & alpine mist simulation',
       '3D stacked card carousel with perspective translation & spring flip',
-      'Region switcher (Himalayas, Ladakh, Spiti) with live altitude/temp readouts',
-      'Tactile glassmorphic expedition booking trigger',
-    ],
-    tokens: [
-      { name: 'Alpine Midnight', value: '#0a0d12', type: 'color' },
-      { name: 'Glacial Reflection', value: '#1a2434', type: 'color' },
-      { name: 'Snow Flurry White', value: 'rgba(255, 255, 255, 0.95)', type: 'color' },
-      { name: 'Card Glass Border', value: 'rgba(255, 255, 255, 0.15)', type: 'color' },
-      { name: 'Hero Condensed Display', value: '-apple-system, sans-serif (800 / 64px)', type: 'typography' },
-      { name: 'Card Blur Filter', value: 'backdrop-filter: blur(14px)', type: 'shadow' },
-      { name: 'Card Perspective', value: 'perspective: 1000px', type: 'radius' },
+      'Interactive regional metadata readouts (elevation, temperature, coordinates)',
     ],
   },
   {
     id: 'real-estate',
-    title: 'Architectural Residences // Design Interior',
-    subtitle: 'High-end interior architecture consulting with interactive spatial hotspots & bilingual UI',
-    category: 'Spatial Design · Architecture',
+    title: 'Luxury Architecture // Design Interior',
+    subtitle: 'High-end interior architecture with spatial hotspot pins & instant bilingual switching',
+    category: 'Architectural Editorial · Spatial UI',
     year: '2025',
-    figmaUrl: 'https://www.figma.com/proto/8lCw1pymC6LzSEgkbt897E/real-estate?node-id=1-8',
     description:
-      'Luxury residential showcase designed with a dark Scandinavian aesthetic. Features pulsing architectural inspection pins that detail optical specs and bespoke furniture, a glassmorphic consultation card, and an instant EN / RU locale toggle.',
+      'Dual architectural residences inspired by high-end Scandinavian and brutalist concrete design. Features a dark frosted glassmorphic panel, instantaneous RU/EN bilingual translation, pulsing hotspot pins revealing material specifications, and an architectural concrete living space.',
     highlights: [
-      'Interactive room inspection pins revealing material & lighting specs',
-      'Deep frosted glassmorphic card with backdrop-blur & thin white borders',
-      'Bilingual toggle (English / Russian) re-rendering all typography',
-      'Integrated modal consultation booking drawer',
-    ],
-    tokens: [
-      { name: 'Basalt Charcoal', value: '#121413', type: 'color' },
-      { name: 'Glass Card Frost', value: 'rgba(28, 30, 29, 0.65)', type: 'color' },
-      { name: 'Warm 2700K Glow', value: 'rgba(250, 204, 110, 0.45)', type: 'color' },
-      { name: 'Thin White Border', value: 'rgba(255, 255, 255, 0.12)', type: 'color' },
-      { name: 'Title Serif', value: 'Georgia, serif (Display 42px)', type: 'typography' },
-      { name: 'Glass Frost Blur', value: 'backdrop-filter: blur(18px)', type: 'shadow' },
+      'Instantaneous RU / EN bilingual toggle across all headings, copy, and form inputs',
+      'Frosted acrylic glass panel with backdrop blur (24px) and subtle border glow',
+      '3 interactive pulsing architectural hotspot pins revealing lighting and finish specs',
+      'Live scene switcher between Master Suite and Concrete Living Pavilion',
     ],
   },
   {
     id: 'course-f',
-    title: 'Course-F // EdTech & SaaS Dashboard',
-    subtitle: 'Productivity web app with live SVG analytics, radial progress rings, and curriculum builder',
-    category: 'SaaS Platform · Dashboard Systems',
+    title: 'Course-F // Next-Gen EdTech SaaS',
+    subtitle: 'Modern education web application with dark navigation & interactive SVG charts',
+    category: 'SaaS Platform · Data Visualization',
     year: '2025',
-    figmaUrl: 'https://www.figma.com/design/OchfJCUAXpSoPtgCasz2yO/course-F?node-id=0-1',
     description:
-      'Comprehensive product design for modern educators. Features a collapsible dark sidebar, live interactive engagement graph with hover metrics, animated SVG progress completion rings, tabbed course filtering, and modal module publication.',
+      'High-density EdTech learning management platform. Incorporates an obsidian sidebar with jewel-gradient brand identity, welcome banner featuring 3D glassmorphic illustration, interactive SVG weekly learning velocity spline with data tooltips, and reactive course curriculum progress toggles.',
     highlights: [
-      'Interactive weekly engagement line chart with data point tooltips',
-      'Radial SVG cohort completion ring with dynamic stroke-dashoffset',
-      'Tabbed course directory (All, In Progress, Completed)',
-      'Working curriculum modal builder with local state publication',
-    ],
-    tokens: [
-      { name: 'Sidebar Dark', value: '#0f172a', type: 'color' },
-      { name: 'Dashboard Canvas', value: '#f8fafc', type: 'color' },
-      { name: 'Brand Electric Blue', value: '#3b82f6', type: 'color' },
-      { name: 'Success Emerald', value: '#10b981', type: 'color' },
-      { name: 'Amber Active', value: '#f59e0b', type: 'color' },
-      { name: 'UI Sans', value: 'Inter, system-ui, sans-serif', type: 'typography' },
-      { name: 'Card Elevation', value: '0 4px 20px rgba(0, 0, 0, 0.05)', type: 'shadow' },
+      'Obsidian sidebar (#13151b) with jewel accent brand mark and navigation states',
+      '3D glassmorphic dashboard illustration banner with progress highlights',
+      'Interactive SVG weekly engagement spline chart with hover data tooltips',
+      'SVG radial mastery gauge (78% completion) and filterable curriculum progress rows',
     ],
   },
 ]
 
 export default function DesignLabSection() {
   const [activeId, setActiveId] = useState<PrototypeId>('coffee-colors')
-  const [showTokens, setShowTokens] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
 
-  const activeMeta = PROTOTYPES_REGISTRY.find((p) => p.id === activeId) || PROTOTYPES_REGISTRY[0]
-
-  const getDummyUrl = (id: PrototypeId) => {
-    switch (id) {
-      case 'coffee-colors':
-        return 'brewlab.design/tasting-experience'
-      case 'travely':
-        return 'travely.expeditions/himalayan-traverse'
-      case 'real-estate':
-        return 'residences.architectural/bespoke-interior'
-      case 'course-f':
-        return 'coursef.app/instructor-dashboard'
-    }
-  }
+  const activeMeta =
+    PROTOTYPES_REGISTRY.find((p) => p.id === activeId) || PROTOTYPES_REGISTRY[0]
 
   return (
     <section className="design-lab-section container" id="designs">
@@ -142,17 +87,17 @@ export default function DesignLabSection() {
           <h2>
             Tactile UI craft &amp;
             <br />
-            <em>live prototypes.</em>
+            <em>live explorations.</em>
           </h2>
         </div>
         <p className="section-note">
-          Hands-on web implementations of recent Figma design explorations. Every prototype below is fully working — switch palettes, inspect spatial hotspots, trigger micro-physics, or explore dashboard analytics.
+          Interactive web implementations of experimental brand, motion, and product interfaces. Built with responsive layout systems, realistic micro-physics, and precise typography.
         </p>
       </div>
 
-      {/* Prototype Selector Pills */}
+      {/* Prototype Selector Navigation */}
       <div className="prototype-nav-pills" role="tablist">
-        {PROTOTYPES_REGISTRY.map((p) => {
+        {PROTOTYPES_REGISTRY.map((p, idx) => {
           const isActive = p.id === activeId
           return (
             <button
@@ -161,38 +106,33 @@ export default function DesignLabSection() {
               role="tab"
               aria-selected={isActive}
               className={`proto-tab-btn ${isActive ? 'is-active' : ''}`}
-              onClick={() => {
-                setActiveId(p.id)
-                setShowTokens(false)
-              }}
+              onClick={() => setActiveId(p.id)}
             >
-              <span className="proto-tab-badge">
-                {p.id === 'coffee-colors' && '☕'}
-                {p.id === 'travely' && '🏔️'}
-                {p.id === 'real-estate' && '🏛️'}
-                {p.id === 'course-f' && '📊'}
-              </span>
-              <span className="proto-tab-name">
-                {p.id === 'coffee-colors' && 'Coffee Colors'}
-                {p.id === 'travely' && 'Travely'}
-                {p.id === 'real-estate' && 'Luxury Interior'}
-                {p.id === 'course-f' && 'Course-F SaaS'}
-              </span>
-              <span className="proto-tab-sub">{p.category.split('·')[0]}</span>
+              <span className="proto-tab-number">0{idx + 1}</span>
+              <div className="proto-tab-text-group">
+                <span className="proto-tab-name">
+                  {p.id === 'coffee-colors' && 'Coffee Colors'}
+                  {p.id === 'travely' && 'Travely'}
+                  {p.id === 'real-estate' && 'Luxury Interior'}
+                  {p.id === 'course-f' && 'Course-F SaaS'}
+                </span>
+                <span className="proto-tab-sub">
+                  {p.id === 'coffee-colors' && 'Dynamic Theming & Depth'}
+                  {p.id === 'travely' && 'Atmospheric 3D Mountain Motion'}
+                  {p.id === 'real-estate' && 'Spatial Hotspots & Bilingual UI'}
+                  {p.id === 'course-f' && 'SaaS Dashboard & Analytics'}
+                </span>
+              </div>
             </button>
           )
         })}
       </div>
 
-      {/* Main Interactive Stage */}
+      {/* Master Interactive Stage */}
       <div className="design-lab-stage">
         <DeviceFrame
           title={activeMeta.title}
-          url={getDummyUrl(activeId)}
           category={activeMeta.category}
-          figmaUrl={activeMeta.figmaUrl}
-          showTokens={showTokens}
-          onToggleTokens={() => setShowTokens(!showTokens)}
           isFullscreen={isFullscreen}
           onToggleFullscreen={() => setIsFullscreen(!isFullscreen)}
         >
@@ -201,16 +141,9 @@ export default function DesignLabSection() {
           {activeId === 'real-estate' && <RealEstateShowcase />}
           {activeId === 'course-f' && <CourseFShowcase />}
         </DeviceFrame>
-
-        {/* Design Token Inspection Drawer */}
-        <DesignTokenDrawer
-          tokens={activeMeta.tokens}
-          isOpen={showTokens}
-          onClose={() => setShowTokens(false)}
-        />
       </div>
 
-      {/* Design Insights & Specification Bar Below Canvas */}
+      {/* Design Insights & Specification Bar Below Stage */}
       <div className="prototype-spec-footer">
         <div className="spec-info-col">
           <div className="spec-meta-row">

@@ -7,29 +7,26 @@ interface CourseItem {
   title: string
   category: string
   lessons: number
-  students: number
-  progress: number // percentage
-  status: 'active' | 'completed' | 'draft'
+  progress: number
+  status: 'active' | 'completed'
   color: string
 }
 
-const COURSES: CourseItem[] = [
+const INITIAL_COURSES: CourseItem[] = [
   {
     id: 'c1',
-    title: 'Advanced Multimodal AI Product Design',
+    title: 'Multimodal AI Product Architecture',
     category: 'Product & AI',
     lessons: 18,
-    students: 1420,
     progress: 78,
     status: 'active',
-    color: '#3b82f6',
+    color: '#6366f1',
   },
   {
     id: 'c2',
-    title: '0→1 Customer Discovery & Problem Validation',
+    title: '0→1 Customer Discovery & Validation',
     category: 'Startup Execution',
     lessons: 12,
-    students: 2890,
     progress: 100,
     status: 'completed',
     color: '#10b981',
@@ -39,324 +36,283 @@ const COURSES: CourseItem[] = [
     title: 'Figma to Code: Design Systems at Scale',
     category: 'UX Engineering',
     lessons: 24,
-    students: 3100,
     progress: 45,
     status: 'active',
     color: '#8b5cf6',
-  },
-  {
-    id: 'c4',
-    title: 'Behavioral Economics for Product Growth',
-    category: 'Growth & Funnels',
-    lessons: 15,
-    students: 980,
-    progress: 92,
-    status: 'active',
-    color: '#f59e0b',
   },
 ]
 
 export default function CourseFShowcase() {
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'completed'>('all')
   const [activeNav, setActiveNav] = useState('Overview')
-  const [hoveredDataPoint, setHoveredDataPoint] = useState<{ day: string; value: number } | null>(null)
-  const [createModalOpen, setCreateModalOpen] = useState(false)
-  const [newTitle, setNewTitle] = useState('')
-  const [courseList, setCourseList] = useState<CourseItem[]>(COURSES)
+  const [hoveredPoint, setHoveredPoint] = useState<{ day: string; value: number; x: number; y: number } | null>(null)
+  const [courses, setCourses] = useState<CourseItem[]>(INITIAL_COURSES)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
 
-  const chartData = [
-    { day: 'Mon', value: 38 },
-    { day: 'Tue', value: 52 },
-    { day: 'Wed', value: 46 },
-    { day: 'Thu', value: 74 },
-    { day: 'Fri', value: 68 },
-    { day: 'Sat', value: 89 },
-    { day: 'Sun', value: 95 },
+  const weeklyData = [
+    { day: 'Mon', value: 2.4, x: 20, y: 70 },
+    { day: 'Tue', value: 3.8, x: 75, y: 48 },
+    { day: 'Wed', value: 3.1, x: 130, y: 58 },
+    { day: 'Thu', value: 5.2, x: 185, y: 25 },
+    { day: 'Fri', value: 4.6, x: 240, y: 35 },
+    { day: 'Sat', value: 6.0, x: 295, y: 15 },
+    { day: 'Sun', value: 5.5, x: 350, y: 22 },
   ]
 
-  const filteredCourses = courseList.filter((c) => {
+  const filteredCourses = courses.filter((c) => {
     if (activeTab === 'all') return true
     return c.status === activeTab
   })
 
-  const handleCreateCourse = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newTitle.trim()) return
-
-    const newCourse: CourseItem = {
-      id: `c-${Date.now()}`,
-      title: newTitle,
-      category: 'Product Strategy',
-      lessons: 10,
-      students: 1,
-      progress: 0,
-      status: 'active',
-      color: '#06b6d4',
-    }
-
-    setCourseList([newCourse, ...courseList])
-    setNewTitle('')
-    setCreateModalOpen(false)
-    setToastMessage(`✓ Course "${newTitle}" created successfully!`)
-    setTimeout(() => setToastMessage(null), 3000)
+  const toggleCourseStatus = (id: string) => {
+    setCourses((prev) =>
+      prev.map((c) => {
+        if (c.id === id) {
+          const nextStatus = c.status === 'active' ? 'completed' : 'active'
+          const nextProgress = nextStatus === 'completed' ? 100 : 50
+          return { ...c, status: nextStatus, progress: nextProgress }
+        }
+        return c
+      })
+    )
+    setToastMessage('✓ Course progress updated!')
+    setTimeout(() => setToastMessage(null), 2200)
   }
 
-  // SVG Chart path calculation
-  const maxVal = 100
-  const chartHeight = 120
-  const chartWidth = 360
-  const points = chartData.map((d, i) => {
-    const x = (i / (chartData.length - 1)) * chartWidth
-    const y = chartHeight - (d.value / maxVal) * chartHeight
-    return { x, y, day: d.day, value: d.value }
-  })
-  const pathD = `M ${points.map((p) => `${p.x} ${p.y}`).join(' L ')}`
-  const areaD = `${pathD} L ${chartWidth} ${chartHeight} L 0 ${chartHeight} Z`
-
   return (
-    <div className="course-f-container">
-      {/* Dark Sidebar Navigation */}
+    <div className="course-f-app">
+      {/* Dark Sidebar matching Figma */}
       <aside className="course-f-sidebar">
         <div className="sidebar-brand">
-          <span className="brand-logo">⌘</span>
-          <span className="brand-name">CourseF</span>
+          <div className="brand-gem-icon">✦</div>
+          <span className="brand-title">Course-F</span>
         </div>
 
         <nav className="sidebar-nav">
-          {['Overview', 'Courses', 'Students', 'Analytics', 'Settings'].map((item) => (
+          {['Overview', 'Courses', 'Analytics', 'Schedule', 'Settings'].map((item) => (
             <button
               key={item}
               type="button"
               className={`sidebar-nav-item ${activeNav === item ? 'is-active' : ''}`}
               onClick={() => setActiveNav(item)}
             >
-              <span className="nav-icon">
-                {item === 'Overview' && '📊'}
-                {item === 'Courses' && '📚'}
-                {item === 'Students' && '👥'}
-                {item === 'Analytics' && '📈'}
-                {item === 'Settings' && '⚙️'}
-              </span>
-              <span className="nav-label">{item}</span>
+              <span className="nav-bullet" />
+              <span>{item}</span>
             </button>
           ))}
         </nav>
 
-        <div className="sidebar-footer">
-          <div className="instructor-card">
-            <span className="avatar-chip">DC</span>
-            <div className="instructor-meta">
-              <strong>Dhananjay C.</strong>
-              <small>Lead Instructor</small>
-            </div>
+        <div className="sidebar-user-card">
+          <div className="user-avatar-circle">DC</div>
+          <div className="user-details">
+            <strong>Dhananjay C.</strong>
+            <small>Pro Learner</small>
           </div>
         </div>
       </aside>
 
-      {/* Main SaaS Content Viewport */}
+      {/* Main SaaS Dashboard Surface */}
       <main className="course-f-main">
-        {/* Top Header Bar */}
-        <header className="course-f-topbar">
-          <div className="topbar-search">
-            <span className="search-icon">🔍</span>
-            <input type="text" placeholder="Search curriculum, assignments, analytics..." />
+        {/* Top Search & Profile Bar */}
+        <header className="course-f-header">
+          <div className="header-search-wrap">
+            <span className="search-glyph">🔍</span>
+            <input
+              type="text"
+              placeholder="Search courses, modules, case studies..."
+              className="header-search-input"
+            />
           </div>
 
-          <div className="topbar-actions">
-            <button
-              type="button"
-              className="create-course-btn"
-              onClick={() => setCreateModalOpen(true)}
-            >
-              + New Course
-            </button>
+          <div className="header-actions">
+            <span className="notification-bell">🔔<i className="badge-dot" /></span>
+            <span className="header-status-pill">Active Session</span>
           </div>
         </header>
 
-        {/* Dashboard Metrics Row */}
-        <div className="metrics-grid">
-          <div className="metric-card">
-            <span className="metric-title">TOTAL LEARNERS</span>
-            <div className="metric-val-row">
-              <strong className="metric-number">12,840</strong>
-              <span className="metric-trend up">+14.2%</span>
+        {/* Dashboard Body */}
+        <div className="course-f-content">
+          {/* Welcome Banner with 3D Illustration */}
+          <div className="welcome-banner-card">
+            <div className="banner-copy">
+              <span className="banner-tag">SPRING SEMESTER</span>
+              <h2>Welcome back, Dhananjay!</h2>
+              <p>
+                You&apos;ve completed 78% of your weekly learning goals. Complete 1 more module to maintain your 14-day streak.
+              </p>
             </div>
-            <span className="metric-sub">Across 4 shipped academies</span>
+            <div className="banner-visual-box">
+              <img
+                src="/images/designs/course_f_hero_illustration.jpg"
+                alt="3D Dashboard Illustration"
+                className="banner-illustration-img"
+              />
+            </div>
           </div>
 
-          <div className="metric-card">
-            <span className="metric-title">COMPLETION RATE</span>
-            <div className="metric-val-row">
-              <strong className="metric-number">88.4%</strong>
-              {/* Radial Progress Ring */}
-              <div className="completion-ring-box">
-                <svg width="44" height="44" viewBox="0 0 44 44">
-                  <circle cx="22" cy="22" r="17" className="ring-bg" />
-                  <circle
-                    cx="22"
-                    cy="22"
-                    r="17"
-                    className="ring-bar"
-                    strokeDasharray={106.8}
-                    strokeDashoffset={106.8 * (1 - 0.884)}
+          {/* Metrics & Analytics Row */}
+          <div className="dashboard-metrics-row">
+            {/* SVG Weekly Activity Chart */}
+            <div className="metric-card chart-card">
+              <div className="card-header-flex">
+                <div>
+                  <h3>Learning Velocity</h3>
+                  <small>Weekly Hours Spent</small>
+                </div>
+                <span className="trend-green-pill">+18.4% vs last week</span>
+              </div>
+
+              <div className="svg-chart-container">
+                <svg viewBox="0 0 380 90" className="activity-spline-svg">
+                  <defs>
+                    <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#6366f1" stopOpacity="0.4" />
+                      <stop offset="100%" stopColor="#6366f1" stopOpacity="0.0" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Area fill */}
+                  <path
+                    d="M 20 70 C 50 55, 60 50, 75 48 C 95 45, 110 60, 130 58 C 150 55, 165 30, 185 25 C 205 20, 220 40, 240 35 C 260 30, 275 18, 295 15 C 315 12, 330 25, 350 22 L 350 85 L 20 85 Z"
+                    fill="url(#chartGradient)"
                   />
+
+                  {/* Line path */}
+                  <path
+                    d="M 20 70 C 50 55, 60 50, 75 48 C 95 45, 110 60, 130 58 C 150 55, 165 30, 185 25 C 205 20, 220 40, 240 35 C 260 30, 275 18, 295 15 C 315 12, 330 25, 350 22"
+                    fill="none"
+                    stroke="#6366f1"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                  />
+
+                  {/* Interactive Nodes */}
+                  {weeklyData.map((d) => (
+                    <circle
+                      key={d.day}
+                      cx={d.x}
+                      cy={d.y}
+                      r={hoveredPoint?.day === d.day ? 6 : 4}
+                      fill="#ffffff"
+                      stroke="#6366f1"
+                      strokeWidth="2.5"
+                      style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+                      onMouseEnter={() => setHoveredPoint(d)}
+                      onMouseLeave={() => setHoveredPoint(null)}
+                    />
+                  ))}
                 </svg>
-              </div>
-            </div>
-            <span className="metric-sub">P90 cohort retention</span>
-          </div>
 
-          <div className="metric-card chart-card">
-            <div className="chart-header">
-              <span className="metric-title">WEEKLY ENGAGEMENT</span>
-              {hoveredDataPoint && (
-                <span className="hover-badge">
-                  {hoveredDataPoint.day}: {hoveredDataPoint.value}k active
-                </span>
-              )}
-            </div>
-
-            {/* Live Interactive SVG Graph */}
-            <div className="svg-chart-wrapper">
-              <svg width="100%" height="80" viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.35" />
-                    <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
-                  </linearGradient>
-                </defs>
-                <path d={areaD} fill="url(#chartGradient)" />
-                <path d={pathD} fill="none" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" />
-                {points.map((p) => (
-                  <circle
-                    key={p.day}
-                    cx={p.x}
-                    cy={p.y}
-                    r={hoveredDataPoint?.day === p.day ? 6 : 4}
-                    fill="#3b82f6"
-                    className="chart-dot"
-                    onMouseEnter={() => setHoveredDataPoint({ day: p.day, value: p.value })}
-                    onMouseLeave={() => setHoveredDataPoint(null)}
-                  />
-                ))}
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        {/* Course Directory Section */}
-        <section className="course-directory">
-          <div className="directory-header">
-            <h3>Active Curriculums</h3>
-
-            {/* Filter Tabs */}
-            <div className="filter-tabs">
-              <button
-                type="button"
-                className={`tab-btn ${activeTab === 'all' ? 'is-active' : ''}`}
-                onClick={() => setActiveTab('all')}
-              >
-                All ({courseList.length})
-              </button>
-              <button
-                type="button"
-                className={`tab-btn ${activeTab === 'active' ? 'is-active' : ''}`}
-                onClick={() => setActiveTab('active')}
-              >
-                In Progress
-              </button>
-              <button
-                type="button"
-                className={`tab-btn ${activeTab === 'completed' ? 'is-active' : ''}`}
-                onClick={() => setActiveTab('completed')}
-              >
-                Completed
-              </button>
-            </div>
-          </div>
-
-          <div className="courses-grid">
-            {filteredCourses.map((c) => (
-              <div key={c.id} className="course-card">
-                <div className="course-top">
-                  <span className="category-pill" style={{ color: c.color, borderColor: `${c.color}40` }}>
-                    {c.category}
-                  </span>
-                  <span className={`status-pill ${c.status}`}>
-                    {c.status === 'completed' ? '✓ Completed' : `${c.progress}% done`}
-                  </span>
-                </div>
-
-                <h4 className="course-title">{c.title}</h4>
-
-                <div className="course-progress-track">
+                {/* Hover Tooltip */}
+                {hoveredPoint && (
                   <div
-                    className="course-progress-fill"
-                    style={{ width: `${c.progress}%`, backgroundColor: c.color }}
-                  />
-                </div>
-
-                <div className="course-meta-row">
-                  <span>{c.lessons} Lessons</span>
-                  <span>{c.students.toLocaleString()} Students</span>
-                </div>
-
-                <button
-                  type="button"
-                  className="resume-course-btn"
-                  onClick={() => setToastMessage(`▶ Opened module: ${c.title}`)}
-                >
-                  {c.status === 'completed' ? 'Review Course ↗' : 'Resume Module →'}
-                </button>
+                    className="chart-hover-tooltip"
+                    style={{ left: `${(hoveredPoint.x / 380) * 100}%` }}
+                  >
+                    <span>{hoveredPoint.day}: {hoveredPoint.value} hrs</span>
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
-        </section>
-      </main>
-
-      {/* Create Course Modal */}
-      {createModalOpen && (
-        <div className="course-modal-backdrop" onClick={() => setCreateModalOpen(false)}>
-          <div className="course-modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Create New Curriculum</h3>
-              <button type="button" className="close-btn" onClick={() => setCreateModalOpen(false)}>
-                ✕
-              </button>
             </div>
 
-            <form onSubmit={handleCreateCourse} className="modal-form">
-              <label>
-                <span>Curriculum Title</span>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. LLM Evaluation & Grounded Prompts"
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                />
-              </label>
-
-              <div className="modal-buttons">
-                <button type="button" className="cancel-btn" onClick={() => setCreateModalOpen(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="submit-btn">
-                  Publish to Dashboard
-                </button>
+            {/* Radial Completion Gauge Card */}
+            <div className="metric-card radial-card">
+              <div className="radial-lockup">
+                <svg viewBox="0 0 100 100" className="radial-svg">
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    fill="none"
+                    stroke="#e2e8f0"
+                    strokeWidth="8"
+                  />
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    fill="none"
+                    stroke="#10b981"
+                    strokeWidth="8"
+                    strokeDasharray="251.2"
+                    strokeDashoffset="55.2"
+                    strokeLinecap="round"
+                    transform="rotate(-90 50 50)"
+                  />
+                  <text
+                    x="50"
+                    y="55"
+                    textAnchor="middle"
+                    className="radial-percent-text"
+                  >
+                    78%
+                  </text>
+                </svg>
+                <div className="radial-text-box">
+                  <strong>Course Mastery</strong>
+                  <small>4 of 5 modules completed</small>
+                </div>
               </div>
-            </form>
+            </div>
+          </div>
+
+          {/* Courses List Section */}
+          <div className="course-roster-section">
+            <div className="roster-header">
+              <h3>Enrolled Curriculum</h3>
+              <div className="filter-pill-group">
+                {(['all', 'active', 'completed'] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    className={`filter-btn ${activeTab === tab ? 'is-active' : ''}`}
+                    onClick={() => setActiveTab(tab)}
+                  >
+                    {tab.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="course-cards-stack">
+              {filteredCourses.map((c) => (
+                <div key={c.id} className="course-item-row">
+                  <div className="course-status-indicator" style={{ backgroundColor: c.color }} />
+                  <div className="course-title-col">
+                    <span className="course-cat-tag">{c.category}</span>
+                    <h4>{c.title}</h4>
+                  </div>
+                  <div className="course-progress-col">
+                    <div className="progress-track-bar">
+                      <div
+                        className="progress-fill-bar"
+                        style={{
+                          width: `${c.progress}%`,
+                          backgroundColor: c.status === 'completed' ? '#10b981' : '#6366f1',
+                        }}
+                      />
+                    </div>
+                    <small>{c.progress}% · {c.lessons} Lessons</small>
+                  </div>
+                  <button
+                    type="button"
+                    className="course-action-btn"
+                    onClick={() => toggleCourseStatus(c.id)}
+                  >
+                    {c.status === 'completed' ? '✓ Completed' : 'Continue →'}
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      )}
 
-      {/* Toast Feedback */}
-      {toastMessage && (
-        <div className="course-f-toast" role="status">
-          <span>{toastMessage}</span>
-        </div>
-      )}
+        {toastMessage && (
+          <div className="course-f-toast">
+            <span>{toastMessage}</span>
+          </div>
+        )}
+      </main>
     </div>
   )
 }
