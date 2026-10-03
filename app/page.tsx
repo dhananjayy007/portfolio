@@ -118,69 +118,158 @@ function ProjectVisual({ kind }: { kind: 'thenvue' | 'merchow' | 'gallery' }) {
 
 function ContactForm() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
-  const [status, setStatus] = useState<'idle' | 'sent'>('idle')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [statusMessage, setStatusMessage] = useState('')
+  const [copiedEmail, setCopiedEmail] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const { name, email, message } = formData
-    const mailtoUrl = `mailto:dhananjayy6397@gmail.com?subject=${encodeURIComponent(
-      `Product Inquiry from ${name || 'Portfolio Visitor'}`
-    )}&body=${encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
-    )}`
-    window.location.href = mailtoUrl
-    setStatus('sent')
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+      setStatus('error')
+      setStatusMessage('Please fill in your name, email, and message.')
+      return
+    }
+
+    setStatus('loading')
+    setStatusMessage('')
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+      const data = await res.json()
+
+      if (res.ok && data.success) {
+        setStatus('success')
+        setStatusMessage('Your message has been sent directly to Dhananjay! I will reply shortly.')
+        setFormData({ name: '', email: '', message: '' })
+      } else {
+        setStatus('error')
+        setStatusMessage(
+          data.error || 'Could not send message automatically. Please use the Gmail option below.'
+        )
+      }
+    } catch {
+      setStatus('error')
+      setStatusMessage(
+        'Network error while sending. You can reach out directly via Gmail below.'
+      )
+    }
   }
 
+  const handleCopyEmail = () => {
+    try {
+      navigator.clipboard.writeText('dhananjayy6397@gmail.com')
+      setCopiedEmail(true)
+      setTimeout(() => setCopiedEmail(false), 2400)
+    } catch {}
+  }
+
+  const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=dhananjayy6397@gmail.com&su=${encodeURIComponent(
+    formData.name ? `Product Inquiry from ${formData.name}` : 'Product Inquiry / Project Collab'
+  )}&body=${encodeURIComponent(
+    formData.message
+      ? `Hi Dhananjay,\n\n${formData.message}\n\nBest,\n${formData.name || ''}\n${formData.email || ''}`
+      : 'Hi Dhananjay,\n\nI came across your portfolio and wanted to reach out regarding...'
+  )}`
+
   return (
-    <form className="contact-form" onSubmit={handleSubmit}>
-      <div className="form-field">
-        <label htmlFor="contact-name">NAME</label>
-        <input
-          id="contact-name"
-          type="text"
-          required
-          placeholder="Your name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        />
-      </div>
+    <div className="contact-form-wrapper">
+      <form className="contact-form" onSubmit={handleSubmit}>
+        <div className="form-field">
+          <label htmlFor="contact-name">NAME</label>
+          <input
+            id="contact-name"
+            type="text"
+            required
+            placeholder="Your name"
+            value={formData.name}
+            disabled={status === 'loading'}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
+        </div>
 
-      <div className="form-field">
-        <label htmlFor="contact-email">EMAIL</label>
-        <input
-          id="contact-email"
-          type="email"
-          required
-          placeholder="your@email.com"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-        />
-      </div>
+        <div className="form-field">
+          <label htmlFor="contact-email">EMAIL</label>
+          <input
+            id="contact-email"
+            type="email"
+            required
+            placeholder="your@email.com"
+            value={formData.email}
+            disabled={status === 'loading'}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          />
+        </div>
 
-      <div className="form-field">
-        <label htmlFor="contact-message">MESSAGE</label>
-        <textarea
-          id="contact-message"
-          required
-          placeholder="What's on your mind?"
-          rows={5}
-          value={formData.message}
-          onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-        />
-      </div>
+        <div className="form-field">
+          <label htmlFor="contact-message">MESSAGE</label>
+          <textarea
+            id="contact-message"
+            required
+            placeholder="What would you like to build or discuss?"
+            rows={5}
+            value={formData.message}
+            disabled={status === 'loading'}
+            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+          />
+        </div>
 
-      <div className="form-actions">
-        <button type="submit" className="contact-submit-btn">
-          {status === 'sent' ? 'Opening Mail Client...' : 'Send Message'}
-        </button>
-        {status === 'sent' && (
-          <span className="form-success-note">
-            ✓ Prepared in your email app!
-          </span>
+        {status === 'success' && (
+          <div className="contact-status-banner is-success">
+            <span className="status-icon">✓</span>
+            <span>{statusMessage}</span>
+          </div>
         )}
-      </div>
-    </form>
+
+        {status === 'error' && (
+          <div className="contact-status-banner is-error">
+            <span className="status-icon">⚠</span>
+            <span>{statusMessage}</span>
+          </div>
+        )}
+
+        <div className="form-actions">
+          <button
+            type="submit"
+            className="contact-submit-btn"
+            disabled={status === 'loading'}
+          >
+            {status === 'loading' ? (
+              <span className="btn-loading-state">
+                <span className="btn-spinner" /> Sending...
+              </span>
+            ) : status === 'success' ? (
+              '✓ Message Sent!'
+            ) : (
+              'Send Message'
+            )}
+          </button>
+
+          <div className="contact-fallback-actions">
+            <a
+              href={gmailComposeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="contact-secondary-action"
+              title="Open draft directly in Google Chrome / Web Gmail"
+            >
+              Compose in Gmail ↗
+            </a>
+
+            <button
+              type="button"
+              onClick={handleCopyEmail}
+              className="contact-secondary-action"
+            >
+              {copiedEmail ? '✓ Email Copied!' : 'Copy Email'}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
   )
 }
 
@@ -194,6 +283,8 @@ export default function Page() {
   const cursorRef = useRef<HTMLDivElement>(null)
 
   const toggleTheme = () => {
+    const isSwitchingToLight = darkMode
+
     setDarkMode((prev) => {
       const next = !prev
       if (next) {
@@ -206,7 +297,7 @@ export default function Page() {
       return next
     })
 
-    // Handle Easter egg dry joke
+    // Handle Easter egg hint & message
     try {
       sessionStorage.setItem('theme-hint-dismissed', 'true')
     } catch {}
@@ -215,7 +306,15 @@ export default function Page() {
       clearTimeout(easterEggTimerRef.current)
     }
 
-    setEasterEggText('💡 This room got no lights, I guess.')
+    if (isSwitchingToLight) {
+      setEasterEggText(
+        window.scrollY > 450
+          ? '💡 Dropped the lamp from the ceiling! Scroll up to see the room.'
+          : '💡 Down comes the lamp! Room illuminated.'
+      )
+    } else {
+      setEasterEggText('🌙 Lights out. Back to 2 AM thinking.')
+    }
     setEasterEggVisible(true)
 
     easterEggTimerRef.current = setTimeout(() => {
@@ -223,7 +322,7 @@ export default function Page() {
       setTimeout(() => {
         setEasterEggText(null)
       }, 400)
-    }, 3800)
+    }, 4200)
   }
 
   useEffect(() => {
@@ -248,7 +347,7 @@ export default function Page() {
       const hintDismissed = sessionStorage.getItem('theme-hint-dismissed')
       if (!hintDismissed) {
         hintTimer = setTimeout(() => {
-          setEasterEggText('💡 You can turn on the lights from here')
+          setEasterEggText('💡 Drop the ceiling lamp from here')
           setEasterEggVisible(true)
         }, 1200)
       }
@@ -414,7 +513,7 @@ export default function Page() {
 
       {/* 3D Cinematic Hero Section: "The 2 AM Thinking Room" */}
       <section className="workbench-hero" id="hero">
-        <ThinkingWallHero />
+        <ThinkingWallHero isLightMode={!darkMode} onToggleTheme={toggleTheme} />
 
         {/* Minimalist Cinematic Overlay (pointer-events: none on text, auto on CTA) */}
         <div className="hero-overlay-container container">

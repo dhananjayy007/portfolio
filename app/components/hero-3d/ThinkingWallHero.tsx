@@ -3,9 +3,47 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 
-export default function ThinkingWallHero() {
+interface ThinkingWallHeroProps {
+  isLightMode?: boolean
+  onToggleTheme?: () => void
+}
+
+// Crisp mechanical switch snap using Web Audio API
+const playLampClick = (isOn: boolean) => {
+  try {
+    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    if (!AudioCtx) return
+    const ctx = new AudioCtx()
+    if (ctx.state === 'suspended') {
+      ctx.resume()
+    }
+    const now = ctx.currentTime
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+
+    osc.type = 'triangle'
+    osc.frequency.setValueAtTime(isOn ? 1400 : 900, now)
+    osc.frequency.exponentialRampToValueAtTime(140, now + 0.035)
+
+    gain.gain.setValueAtTime(0.12, now)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04)
+
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+
+    osc.start(now)
+    osc.stop(now + 0.05)
+  } catch {}
+}
+
+export default function ThinkingWallHero({ isLightMode = false, onToggleTheme }: ThinkingWallHeroProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [hintVisible, setHintVisible] = useState(true)
+  const lightModeRef = useRef(isLightMode)
+
+  useEffect(() => {
+    lightModeRef.current = isLightMode
+  }, [isLightMode])
 
   useEffect(() => {
     const container = containerRef.current
@@ -14,10 +52,24 @@ export default function ThinkingWallHero() {
     let animationFrameId: number | null = null
     let isRendering = true
 
+    // Sync theme with document class mutations
+    const checkTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark')
+      lightModeRef.current = !isDark
+    }
+    checkTheme()
+
+    const themeObserver = new MutationObserver(() => {
+      checkTheme()
+    })
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+
     // --- Scene, Camera, Renderer ---
     const scene = new THREE.Scene()
-    scene.background = new THREE.Color(0x090a09)
-    scene.fog = new THREE.FogExp2(0x090a09, 0.08)
+    const sceneBgColor = new THREE.Color(0x090a09)
+    scene.background = sceneBgColor
+    const sceneFog = new THREE.FogExp2(0x090a09, 0.08)
+    scene.fog = sceneFog
 
     const camera = new THREE.PerspectiveCamera(
       48,
@@ -77,26 +129,78 @@ export default function ThinkingWallHero() {
     const spotlight = new THREE.SpotLight(0xfdf7eb, 7.5)
     spotlight.position.set(0, 1.6, 2.2)
     spotlight.target = spotlightTarget
-    spotlight.angle = Math.PI / 6.2
+    spotlight.angle = Math.PI / 5.2
     spotlight.penumbra = 0.85
-    spotlight.decay = 1.35
-    spotlight.distance = 6.5
+    spotlight.decay = 1.15
+    spotlight.distance = 15.0
     spotlight.castShadow = true
     spotlight.shadow.mapSize.width = 1024
     spotlight.shadow.mapSize.height = 1024
     spotlight.shadow.camera.near = 0.5
-    spotlight.shadow.camera.far = 6.5
+    spotlight.shadow.camera.far = 15.0
     spotlight.shadow.bias = -0.001
     scene.add(spotlight)
 
     // Subtle localized fill point light following the spotlight for smooth radial falloff
-    const spillLight = new THREE.PointLight(0xf7f0dd, 0.45, 1.8, 2.0)
+    const spillLight = new THREE.PointLight(0xf7f0dd, 0.5, 3.2, 1.8)
     spillLight.position.set(0, 1.6, 0.55)
     scene.add(spillLight)
 
-    // --- Studio Architecture (Floor & Back Wall) ---
-    // Dark matte studio floor with subtle plank perspective
-    const floorGeo = new THREE.PlaneGeometry(16, 16)
+    // --- Studio Architecture (Full-Breadth Back Wall, Skirting, Ceiling & Floor) ---
+    // Full-breadth expansive back studio wall (spans 60m edge-to-edge)
+    const wallGeo = new THREE.PlaneGeometry(60, 16)
+    const wallMat = new THREE.MeshStandardMaterial({
+      color: 0x0e100e,
+      roughness: 0.94,
+      metalness: 0.02,
+    })
+    const backWall = new THREE.Mesh(wallGeo, wallMat)
+    backWall.position.set(0, 8, -0.06)
+    backWall.receiveShadow = true
+    scene.add(backWall)
+
+    // Architectural Skirting / Baseboard
+    const skirtingMat = new THREE.MeshStandardMaterial({
+      color: 0x161815,
+      roughness: 0.75,
+      metalness: 0.2,
+    })
+    const skirting = new THREE.Mesh(
+      new THREE.BoxGeometry(60, 0.14, 0.05),
+      skirtingMat
+    )
+    skirting.position.set(0, 0.07, -0.035)
+    skirting.receiveShadow = true
+    scene.add(skirting)
+
+    // Studio Ceiling (spans 60m x 36m)
+    const ceilingGeo = new THREE.PlaneGeometry(60, 36)
+    const ceilingMat = new THREE.MeshStandardMaterial({
+      color: 0x0a0c0a,
+      roughness: 0.95,
+      metalness: 0.02,
+    })
+    const ceiling = new THREE.Mesh(ceilingGeo, ceilingMat)
+    ceiling.rotation.x = Math.PI / 2
+    ceiling.position.set(0, 5.5, 16)
+    scene.add(ceiling)
+
+    // Side Walls (Framing the room in 3D perspective)
+    const sideWallGeo = new THREE.PlaneGeometry(36, 16)
+    const leftWall = new THREE.Mesh(sideWallGeo, wallMat)
+    leftWall.rotation.y = Math.PI / 2
+    leftWall.position.set(-24, 8, 16)
+    leftWall.receiveShadow = true
+    scene.add(leftWall)
+
+    const rightWall = new THREE.Mesh(sideWallGeo, wallMat)
+    rightWall.rotation.y = -Math.PI / 2
+    rightWall.position.set(24, 8, 16)
+    rightWall.receiveShadow = true
+    scene.add(rightWall)
+
+    // Dark matte studio floor with subtle plank perspective (spans 60m x 36m)
+    const floorGeo = new THREE.PlaneGeometry(60, 36)
     const floorMat = new THREE.MeshStandardMaterial({
       color: 0x0c0e0c,
       roughness: 0.88,
@@ -104,20 +208,20 @@ export default function ThinkingWallHero() {
     })
     const floor = new THREE.Mesh(floorGeo, floorMat)
     floor.rotation.x = -Math.PI / 2
-    floor.position.y = 0
+    floor.position.set(0, 0, 16)
     floor.receiveShadow = true
     scene.add(floor)
 
     // Subtle floor plank lines
-    const gridHelper = new THREE.GridHelper(16, 24, 0x161815, 0x121411)
-    gridHelper.position.y = 0.005
+    const gridHelper = new THREE.GridHelper(60, 48, 0x161815, 0x121411)
+    gridHelper.position.set(0, 0.005, 16)
     scene.add(gridHelper)
 
-    // --- The Thinking Board (The Centerpiece of Mind) ---
-    const boardWidth = 6.6
+    // --- The Master Thinking Board (Wide Studio Triptych spanning 13.6 meters) ---
+    const boardWidth = 13.6
     const boardHeight = 3.6
     const boardGroup = new THREE.Group()
-    boardGroup.position.set(0, 1.8, 0)
+    boardGroup.position.set(0, 1.87, 0)
     scene.add(boardGroup)
 
     // The dark acoustic pinboard background
@@ -151,6 +255,20 @@ export default function ThinkingWallHero() {
     )
     bottomFrame.position.set(0, -boardHeight / 2 - 0.03, 0.02)
     boardGroup.add(bottomFrame)
+
+    const leftFrame = new THREE.Mesh(
+      new THREE.BoxGeometry(0.06, boardHeight + 0.06, 0.05),
+      frameMat
+    )
+    leftFrame.position.set(-boardWidth / 2 - 0.02, 0, 0.02)
+    boardGroup.add(leftFrame)
+
+    const rightFrame = new THREE.Mesh(
+      new THREE.BoxGeometry(0.06, boardHeight + 0.06, 0.05),
+      frameMat
+    )
+    rightFrame.position.set(boardWidth / 2 + 0.02, 0, 0.02)
+    boardGroup.add(rightFrame)
 
     // --- Procedural Textures for Real Pinned Artifacts ---
     // Rendered at 3x canvas resolution with 16x anisotropy for ultra-crisp 3D legibility
@@ -622,14 +740,240 @@ export default function ThinkingWallHero() {
     })
     addPinnedArtifact(-0.15, -0.15, 0.85, 0.52, -0.02, texCentralNote)
 
-    // --- The Seated Figure (The Builder / Thinker) ---
-    // Scaled to occupy ~25% of the hero's visual height, positioned 20% to the right
-    const characterGroup = new THREE.Group()
-    characterGroup.position.set(1.25, 0, 0.85)
-    characterGroup.scale.set(0.6, 0.6, 0.6)
-    scene.add(characterGroup)
+    // --- Left Wing Artifacts: AI Architecture & Systems ---
+    // 10. AI Multimodal Ingestion Pipeline
+    const texAiPipeline = createArtifactTexture(340, 220, (ctx) => {
+      ctx.fillStyle = '#161915'
+      ctx.fillRect(0, 0, 340, 220)
+      ctx.strokeStyle = '#2d3826'
+      ctx.lineWidth = 1.5
+      ctx.strokeRect(0, 0, 340, 220)
 
-    // Stool: simple 4-legged wooden workshop stool (understated, stable)
+      ctx.fillStyle = '#a6bd92'
+      ctx.font = 'bold 11px ui-monospace, monospace'
+      ctx.fillText('MULTIMODAL INGESTION // PIPELINE', 18, 26)
+
+      ctx.fillStyle = '#f5f2e8'
+      ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.fillText('Real-Time Context Synthesis', 18, 54)
+
+      // Pipeline stages
+      const stages = [
+        { name: '1. Audio / Photo Ingest', desc: 'WebRTC / Base64 chunk' },
+        { name: '2. Gemini 1.5 Flash Diarize', desc: 'Speech-to-text + mood extraction' },
+        { name: '3. pgvector Cosine (768)', desc: 'Index similarity & semantic recall' },
+      ]
+      stages.forEach((s, idx) => {
+        const py = 76 + idx * 36
+        ctx.fillStyle = '#21291d'
+        ctx.fillRect(18, py, 304, 28)
+        ctx.fillStyle = '#cbe4ab'
+        ctx.font = 'bold 11px ui-monospace, monospace'
+        ctx.fillText(s.name, 26, py + 18)
+        ctx.fillStyle = '#899480'
+        ctx.font = '10px -apple-system, sans-serif'
+        ctx.fillText(s.desc, 180, py + 18)
+      })
+
+      ctx.fillStyle = '#7a8770'
+      ctx.font = '11px ui-monospace, monospace'
+      ctx.fillText('P95 Latency: 420ms · Zero dropped packets', 18, 204)
+    })
+    addPinnedArtifact(-4.6, 0.72, 1.15, 0.74, -0.02, texAiPipeline)
+
+    // 11. 0→1 PRD Truths Sticky Note
+    const texPrdTruths = createArtifactTexture(240, 240, (ctx) => {
+      ctx.fillStyle = '#faf3dc'
+      ctx.fillRect(0, 0, 240, 240)
+
+      ctx.fillStyle = '#665d48'
+      ctx.font = 'bold 11px ui-monospace, monospace'
+      ctx.fillText('0 → 1 USER TRUTHS', 18, 28)
+
+      ctx.fillStyle = '#161912'
+      ctx.font = 'bold 16px Georgia, serif'
+      ctx.fillText('"Users don\'t think in dates.', 18, 60)
+      ctx.fillText('They think in seasons,', 18, 82)
+      ctx.fillText('faces, and feelings."', 18, 104)
+
+      ctx.fillStyle = '#323a2b'
+      ctx.font = 'bold 12px -apple-system, sans-serif'
+      ctx.fillText('Rule 1: Never ask "What happened?"', 18, 142)
+      ctx.fillText('Rule 2: Capture ambient sound first', 18, 164)
+
+      ctx.fillStyle = '#e5dcc0'
+      ctx.fillRect(18, 186, 204, 32)
+      ctx.fillStyle = '#1c450c'
+      ctx.font = 'bold 12px -apple-system, sans-serif'
+      ctx.fillText('→ Auto-mood tagging from vocal tone', 26, 206)
+    })
+    addPinnedArtifact(-3.4, 0.82, 0.76, 0.76, 0.03, texPrdTruths)
+
+    // 12. Vector Schema Blueprint
+    const texVectorSchema = createArtifactTexture(300, 220, (ctx) => {
+      ctx.fillStyle = '#15191d'
+      ctx.fillRect(0, 0, 300, 220)
+      ctx.strokeStyle = '#273644'
+      ctx.lineWidth = 1.5
+      ctx.strokeRect(0, 0, 300, 220)
+
+      ctx.fillStyle = '#9cbcd6'
+      ctx.font = 'bold 11px ui-monospace, monospace'
+      ctx.fillText('SUPABASE / POSTGRES SCHEMA', 18, 26)
+
+      ctx.fillStyle = '#e8f0f6'
+      ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.fillText('pgvector HNSW Indexing', 18, 54)
+
+      ctx.fillStyle = '#1d2a36'
+      ctx.fillRect(18, 72, 264, 96)
+
+      ctx.fillStyle = '#b7d7f0'
+      ctx.font = '11px ui-monospace, monospace'
+      ctx.fillText('CREATE INDEX memories_emb_idx ON', 26, 94)
+      ctx.fillText('memories USING hnsw (embedding vector_cosine_ops)', 26, 114)
+      ctx.fillText('WITH (m = 16, ef_construction = 64);', 26, 134)
+      ctx.fillStyle = '#89a2b8'
+      ctx.fillText('-- Verified sub-12ms queries on 1M rows', 26, 154)
+
+      ctx.fillStyle = '#7a91a3'
+      ctx.font = '11px ui-monospace, monospace'
+      ctx.fillText('Grounded Citations · Zero Hallucination Guardrails', 18, 198)
+    })
+    addPinnedArtifact(-4.4, -0.68, 1.05, 0.77, 0.02, texVectorSchema)
+
+    // --- Right Wing Artifacts: Creator Commerce & Product Execution ---
+    // 13. Merchow Zero-Dead-Stock Fulfillment Automation
+    const texMerchowPipeline = createArtifactTexture(320, 210, (ctx) => {
+      ctx.fillStyle = '#1b1915'
+      ctx.fillRect(0, 0, 320, 210)
+      ctx.strokeStyle = '#383226'
+      ctx.lineWidth = 1.5
+      ctx.strokeRect(0, 0, 320, 210)
+
+      ctx.fillStyle = '#d6b885'
+      ctx.font = 'bold 11px ui-monospace, monospace'
+      ctx.fillText('MERCHOW // 0-INVENTORY DROPS', 18, 26)
+
+      ctx.fillStyle = '#f8f4ec'
+      ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.fillText('Automated Fulfillment State', 18, 54)
+
+      const steps = [
+        'Creator Drop Page',
+        '→ Razorpay Capture',
+        '→ Qikink API Dispatch',
+        '→ Direct To Door',
+      ]
+      ctx.fillStyle = '#2b251c'
+      ctx.fillRect(18, 74, 284, 38)
+      ctx.fillStyle = '#e8d4b0'
+      ctx.font = 'bold 11px ui-monospace, monospace'
+      ctx.fillText(steps.join(' '), 26, 98)
+
+      // Margins metric block
+      ctx.fillStyle = '#262016'
+      ctx.fillRect(18, 126, 136, 48)
+      ctx.fillStyle = '#e8be78'
+      ctx.font = 'bold 20px Georgia, serif'
+      ctx.fillText('₹450 / unit', 26, 154)
+      ctx.fillStyle = '#9c8a70'
+      ctx.font = '10px ui-monospace, monospace'
+      ctx.fillText('Net Creator Margin', 26, 168)
+
+      ctx.fillStyle = '#262016'
+      ctx.fillRect(166, 126, 136, 48)
+      ctx.fillStyle = '#e8be78'
+      ctx.font = 'bold 20px Georgia, serif'
+      ctx.fillText('99.4%', 174, 154)
+      ctx.fillStyle = '#9c8a70'
+      ctx.font = '10px ui-monospace, monospace'
+      ctx.fillText('On-Time Delivery SLA', 174, 168)
+
+      ctx.fillStyle = '#8f7e68'
+      ctx.font = '11px ui-monospace, monospace'
+      ctx.fillText('Zero capital requirement for independent creators', 18, 196)
+    })
+    addPinnedArtifact(3.85, 0.80, 1.08, 0.71, 0.03, texMerchowPipeline)
+
+    // 14. UX Craft & Micro-Interactions Spec
+    const texDesignCraft = createArtifactTexture(280, 240, (ctx) => {
+      ctx.fillStyle = '#191722'
+      ctx.fillRect(0, 0, 280, 240)
+      ctx.strokeStyle = '#322d42'
+      ctx.lineWidth = 1.5
+      ctx.strokeRect(0, 0, 280, 240)
+
+      ctx.fillStyle = '#b7aadc'
+      ctx.font = 'bold 11px ui-monospace, monospace'
+      ctx.fillText('UX CRAFT // ERGONOMICS', 18, 26)
+
+      ctx.fillStyle = '#f5f2fa'
+      ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.fillText('Tactile Micro-Physics', 18, 54)
+
+      // Spring physics graph
+      ctx.strokeStyle = '#7c6aa8'
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.moveTo(18, 130)
+      ctx.bezierCurveTo(70, 70, 110, 150, 160, 120)
+      ctx.bezierCurveTo(200, 105, 230, 124, 260, 120)
+      ctx.stroke()
+
+      ctx.fillStyle = '#272236'
+      ctx.fillRect(18, 146, 244, 46)
+      ctx.fillStyle = '#d5c8f5'
+      ctx.font = 'bold 12px ui-monospace, monospace'
+      ctx.fillText('spring(stiffness: 38, damping: 6.6)', 26, 168)
+      ctx.fillStyle = '#9c91b8'
+      ctx.font = '11px -apple-system, sans-serif'
+      ctx.fillText('Subtle organic recoil on every interactive touch', 26, 184)
+
+      ctx.fillStyle = '#8578a3'
+      ctx.font = '11px ui-monospace, monospace'
+      ctx.fillText('Fast, tactile, respectful of user focus', 18, 220)
+    })
+    addPinnedArtifact(5.15, 0.65, 0.95, 0.81, -0.02, texDesignCraft)
+
+    // 15. Product Velocity Sticky Note
+    const texProductVelocity = createArtifactTexture(240, 240, (ctx) => {
+      ctx.fillStyle = '#dff0d8'
+      ctx.fillRect(0, 0, 240, 240)
+
+      ctx.fillStyle = '#416335'
+      ctx.font = 'bold 11px ui-monospace, monospace'
+      ctx.fillText('0 → 1 SHIPPED METRICS', 18, 28)
+
+      ctx.fillStyle = '#14290e'
+      ctx.font = 'bold 17px Georgia, serif'
+      ctx.fillText('"Ship early to listen', 18, 58)
+      ctx.fillText('to real user reality."', 18, 80)
+
+      const milestones = [
+        '✓ Concept to Beta: 6 Weeks',
+        '✓ 10k+ organic users',
+        '✓ ₹450 unit creator margin',
+        '✓ Vector recall P95 < 450ms',
+      ]
+      milestones.forEach((m, idx) => {
+        ctx.fillStyle = '#214217'
+        ctx.font = 'bold 12px -apple-system, sans-serif'
+        ctx.fillText(m, 18, 116 + idx * 24)
+      })
+
+      ctx.fillStyle = '#3a662d'
+      ctx.font = 'italic 11px Georgia, serif'
+      ctx.fillText('Built with extreme craftsmanship', 18, 218)
+    })
+    addPinnedArtifact(4.15, -0.68, 0.80, 0.80, 0.04, texProductVelocity)
+
+    // --- Workshop Stool (Anchored in place on studio floor) ---
+    const stoolGroup = new THREE.Group()
+    stoolGroup.position.set(1.25, 0, 0.85)
+    stoolGroup.scale.set(0.6, 0.6, 0.6)
+    scene.add(stoolGroup)
+
     const woodMat = new THREE.MeshStandardMaterial({
       color: 0x27221c,
       roughness: 0.72,
@@ -642,7 +986,7 @@ export default function ThinkingWallHero() {
     )
     stoolSeat.position.set(0, 0.58, 0)
     stoolSeat.castShadow = true
-    characterGroup.add(stoolSeat)
+    stoolGroup.add(stoolSeat)
 
     const stoolLegGeo = new THREE.CylinderGeometry(0.016, 0.012, 0.59, 12)
     const legPositions: [number, number, number, number][] = [
@@ -656,17 +1000,22 @@ export default function ThinkingWallHero() {
       leg.position.set(lx, ly, lz)
       leg.rotation.z = rotZ
       leg.castShadow = true
-      characterGroup.add(leg)
+      stoolGroup.add(leg)
     })
 
-    // Stool rung
     const rung = new THREE.Mesh(
       new THREE.TorusGeometry(0.14, 0.008, 8, 24),
       woodMat
     )
     rung.rotation.x = Math.PI / 2
     rung.position.set(0, 0.22, 0)
-    characterGroup.add(rung)
+    stoolGroup.add(rung)
+
+    // --- The Interactive Thinker / Builder (Stands up & paces along the thinking wall) ---
+    const characterGroup = new THREE.Group()
+    characterGroup.position.set(1.25, 0, 0.85)
+    characterGroup.scale.set(0.6, 0.6, 0.6)
+    scene.add(characterGroup)
 
     // Character Silhouette Materials (Dark studio palette tailored for silhouette reading)
     const jacketMat = new THREE.MeshStandardMaterial({
@@ -685,65 +1034,77 @@ export default function ThinkingWallHero() {
       metalness: 0.06,
     })
 
-    // Feet / Boots firmly planted on the studio floor
-    const leftBoot = new THREE.Mesh(
-      new THREE.BoxGeometry(0.09, 0.07, 0.16),
-      bootMat
-    )
-    leftBoot.position.set(-0.13, 0.035, -0.12)
-    leftBoot.rotation.y = 0.12
-    leftBoot.castShadow = true
-    characterGroup.add(leftBoot)
+    // Left Leg Hierarchical Joint Chain (Hip -> Knee -> Boot)
+    const leftLegGroup = new THREE.Group()
+    leftLegGroup.position.set(-0.13, 0.58, 0)
+    leftLegGroup.rotation.x = 1.48
+    characterGroup.add(leftLegGroup)
 
-    const rightBoot = new THREE.Mesh(
-      new THREE.BoxGeometry(0.09, 0.07, 0.16),
-      bootMat
-    )
-    rightBoot.position.set(0.13, 0.035, -0.12)
-    rightBoot.rotation.y = -0.12
-    rightBoot.castShadow = true
-    characterGroup.add(rightBoot)
-
-    // Both Legs seated naturally on the stool (stable, no movement)
-    // Thighs extending slightly forward from seat
     const leftThigh = new THREE.Mesh(
       new THREE.CylinderGeometry(0.085, 0.072, 0.32, 12),
       pantsMat
     )
-    leftThigh.position.set(-0.13, 0.46, -0.09)
-    leftThigh.rotation.set(0.65, 0, -0.06)
+    leftThigh.position.set(0, -0.16, 0)
     leftThigh.castShadow = true
-    characterGroup.add(leftThigh)
+    leftLegGroup.add(leftThigh)
+
+    const leftKneeGroup = new THREE.Group()
+    leftKneeGroup.position.set(0, -0.32, 0)
+    leftKneeGroup.rotation.x = -1.48
+    leftLegGroup.add(leftKneeGroup)
+
+    const leftCalf = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.072, 0.058, 0.30, 12),
+      pantsMat
+    )
+    leftCalf.position.set(0, -0.15, 0)
+    leftCalf.castShadow = true
+    leftKneeGroup.add(leftCalf)
+
+    const leftBoot = new THREE.Mesh(
+      new THREE.BoxGeometry(0.09, 0.07, 0.16),
+      bootMat
+    )
+    leftBoot.position.set(0, -0.30, 0.035)
+    leftBoot.castShadow = true
+    leftKneeGroup.add(leftBoot)
+
+    // Right Leg Hierarchical Joint Chain (Hip -> Knee -> Boot)
+    const rightLegGroup = new THREE.Group()
+    rightLegGroup.position.set(0.13, 0.58, 0)
+    rightLegGroup.rotation.x = 1.48
+    characterGroup.add(rightLegGroup)
 
     const rightThigh = new THREE.Mesh(
       new THREE.CylinderGeometry(0.085, 0.072, 0.32, 12),
       pantsMat
     )
-    rightThigh.position.set(0.13, 0.46, -0.09)
-    rightThigh.rotation.set(0.65, 0, 0.06)
+    rightThigh.position.set(0, -0.16, 0)
     rightThigh.castShadow = true
-    characterGroup.add(rightThigh)
+    rightLegGroup.add(rightThigh)
 
-    // Calves descending from knees to boots
-    const leftCalf = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.072, 0.058, 0.32, 12),
-      pantsMat
-    )
-    leftCalf.position.set(-0.13, 0.18, -0.14)
-    leftCalf.rotation.set(-0.15, 0, -0.04)
-    leftCalf.castShadow = true
-    characterGroup.add(leftCalf)
+    const rightKneeGroup = new THREE.Group()
+    rightKneeGroup.position.set(0, -0.32, 0)
+    rightKneeGroup.rotation.x = -1.48
+    rightLegGroup.add(rightKneeGroup)
 
     const rightCalf = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.072, 0.058, 0.32, 12),
+      new THREE.CylinderGeometry(0.072, 0.058, 0.30, 12),
       pantsMat
     )
-    rightCalf.position.set(0.13, 0.18, -0.14)
-    rightCalf.rotation.set(-0.15, 0, 0.04)
+    rightCalf.position.set(0, -0.15, 0)
     rightCalf.castShadow = true
-    characterGroup.add(rightCalf)
+    rightKneeGroup.add(rightCalf)
 
-    // Torso / Back (completely stable, quiet seated posture with slight forward contemplation)
+    const rightBoot = new THREE.Mesh(
+      new THREE.BoxGeometry(0.09, 0.07, 0.16),
+      bootMat
+    )
+    rightBoot.position.set(0, -0.30, 0.035)
+    rightBoot.castShadow = true
+    rightKneeGroup.add(rightBoot)
+
+    // Torso / Back & Upper Body
     const torsoGroup = new THREE.Group()
     torsoGroup.position.set(0, 0.60, 0)
     characterGroup.add(torsoGroup)
@@ -753,11 +1114,10 @@ export default function ThinkingWallHero() {
       jacketMat
     )
     torso.position.set(0, 0.24, -0.03)
-    torso.rotation.x = 0.12 // slight natural lean forward
+    torso.rotation.x = 0.12
     torso.castShadow = true
     torsoGroup.add(torso)
 
-    // Shoulders (smooth rounded width, completely stable)
     const shoulders = new THREE.Mesh(
       new THREE.SphereGeometry(0.24, 16, 16),
       jacketMat
@@ -767,42 +1127,59 @@ export default function ThinkingWallHero() {
     shoulders.castShadow = true
     torsoGroup.add(shoulders)
 
-    // Both Arms resting forward toward knees (completely stable, no movement)
+    // Left Arm Chain (Shoulder -> Elbow)
+    const leftArmGroup = new THREE.Group()
+    leftArmGroup.position.set(-0.24, 0.40, -0.03)
+    leftArmGroup.rotation.x = 0.12
+    torsoGroup.add(leftArmGroup)
+
     const leftUpperArm = new THREE.Mesh(
       new THREE.CylinderGeometry(0.052, 0.044, 0.28, 12),
       jacketMat
     )
-    leftUpperArm.position.set(-0.24, 0.34, 0.0)
-    leftUpperArm.rotation.set(0.38, 0.05, 0.20)
+    leftUpperArm.position.set(0, -0.14, 0)
     leftUpperArm.castShadow = true
-    torsoGroup.add(leftUpperArm)
+    leftArmGroup.add(leftUpperArm)
 
-    const rightUpperArm = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.052, 0.044, 0.28, 12),
-      jacketMat
-    )
-    rightUpperArm.position.set(0.24, 0.34, 0.0)
-    rightUpperArm.rotation.set(0.38, -0.05, -0.20)
-    rightUpperArm.castShadow = true
-    torsoGroup.add(rightUpperArm)
+    const leftForearmGroup = new THREE.Group()
+    leftForearmGroup.position.set(0, -0.28, 0)
+    leftForearmGroup.rotation.x = 0.22
+    leftArmGroup.add(leftForearmGroup)
 
     const leftForearm = new THREE.Mesh(
       new THREE.CylinderGeometry(0.044, 0.036, 0.26, 12),
       jacketMat
     )
-    leftForearm.position.set(-0.21, 0.18, -0.10)
-    leftForearm.rotation.set(0.85, 0.10, 0.22)
+    leftForearm.position.set(0, -0.13, 0.02)
     leftForearm.castShadow = true
-    torsoGroup.add(leftForearm)
+    leftForearmGroup.add(leftForearm)
+
+    // Right Arm Chain (Shoulder -> Elbow)
+    const rightArmGroup = new THREE.Group()
+    rightArmGroup.position.set(0.24, 0.40, -0.03)
+    rightArmGroup.rotation.x = 0.12
+    torsoGroup.add(rightArmGroup)
+
+    const rightUpperArm = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.052, 0.044, 0.28, 12),
+      jacketMat
+    )
+    rightUpperArm.position.set(0, -0.14, 0)
+    rightUpperArm.castShadow = true
+    rightArmGroup.add(rightUpperArm)
+
+    const rightForearmGroup = new THREE.Group()
+    rightForearmGroup.position.set(0, -0.28, 0)
+    rightForearmGroup.rotation.x = 0.22
+    rightArmGroup.add(rightForearmGroup)
 
     const rightForearm = new THREE.Mesh(
       new THREE.CylinderGeometry(0.044, 0.036, 0.26, 12),
       jacketMat
     )
-    rightForearm.position.set(0.21, 0.18, -0.10)
-    rightForearm.rotation.set(0.85, -0.10, -0.22)
+    rightForearm.position.set(0, -0.13, 0.02)
     rightForearm.castShadow = true
-    torsoGroup.add(rightForearm)
+    rightForearmGroup.add(rightForearm)
 
     // Head & Neck Group (ONLY the head and neck respond to cursor tracking)
     const headGroup = new THREE.Group()
@@ -1029,6 +1406,193 @@ export default function ThinkingWallHero() {
     lampLight.position.set(0.095, 0.36, -0.07)
     lampGroup.add(lampLight)
 
+    // --- The Architectural Ceiling Pendant Lamp ---
+    // Drops down from the ceiling when light mode is activated to illuminate the 2 AM thinking room
+    const ceilingLampAnchor = new THREE.Vector3(0.25, 5.5, 1.15)
+    const ceilingLampGroup = new THREE.Group()
+    ceilingLampGroup.position.set(ceilingLampAnchor.x, lightModeRef.current ? 2.45 : 5.25, ceilingLampAnchor.z)
+    scene.add(ceilingLampGroup)
+
+    // 1. Ceiling Canopy disc (mounted high on ceiling)
+    const canopyMat = new THREE.MeshStandardMaterial({
+      color: 0x181a17,
+      roughness: 0.6,
+      metalness: 0.5,
+    })
+    const canopy = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.07, 0.07, 0.016, 24),
+      canopyMat
+    )
+    canopy.position.set(ceilingLampAnchor.x, 5.48, ceilingLampAnchor.z)
+    scene.add(canopy)
+
+    // 2. Dynamic Braided Electrical Cable
+    const cordGeo = new THREE.CylinderGeometry(0.0035, 0.0035, 1, 8)
+    const cordMat = new THREE.MeshStandardMaterial({
+      color: 0x121311,
+      roughness: 0.9,
+    })
+    const cord = new THREE.Mesh(cordGeo, cordMat)
+    scene.add(cord)
+
+    // 3. Hanging Lamp Fixture & Shade Body (rotates around top attachment pivot)
+    const lampBody = new THREE.Group()
+    ceilingLampGroup.add(lampBody)
+
+    // Strain relief knuckle & hanging ring at top of fixture
+    const fixtureBrassMat = new THREE.MeshStandardMaterial({
+      color: 0xcca352,
+      roughness: 0.35,
+      metalness: 0.75,
+    })
+    const fixtureKnuckle = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.014, 0.014, 0.05, 16),
+      fixtureBrassMat
+    )
+    fixtureKnuckle.position.set(0, 0.18, 0)
+    lampBody.add(fixtureKnuckle)
+
+    const loopRing = new THREE.Mesh(
+      new THREE.TorusGeometry(0.014, 0.004, 8, 16),
+      fixtureBrassMat
+    )
+    loopRing.position.set(0, 0.21, 0)
+    lampBody.add(loopRing)
+
+    // Upper socket neck
+    const socketNeck = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.024, 0.028, 0.06, 20),
+      fixtureBrassMat
+    )
+    socketNeck.position.set(0, 0.13, 0)
+    lampBody.add(socketNeck)
+
+    // Conical Mid-Century Industrial Pendant Shade
+    const shadeMatExterior = new THREE.MeshStandardMaterial({
+      color: 0x1a1c18,
+      roughness: 0.65,
+      metalness: 0.35,
+      side: THREE.FrontSide,
+    })
+    const shadeMatInterior = new THREE.MeshStandardMaterial({
+      color: 0xf2c463,
+      roughness: 0.28,
+      metalness: 0.85,
+      side: THREE.BackSide,
+    })
+
+    const shadeExt = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.05, 0.28, 0.20, 32, 1, true),
+      shadeMatExterior
+    )
+    shadeExt.castShadow = true
+    lampBody.add(shadeExt)
+
+    const shadeInt = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.049, 0.279, 0.198, 32, 1, true),
+      shadeMatInterior
+    )
+    lampBody.add(shadeInt)
+
+    // Spun metal bottom rolled lip
+    const shadeRim = new THREE.Mesh(
+      new THREE.TorusGeometry(0.28, 0.008, 12, 36),
+      fixtureBrassMat
+    )
+    shadeRim.position.set(0, -0.10, 0)
+    shadeRim.rotation.x = Math.PI / 2
+    lampBody.add(shadeRim)
+
+    // Edison Exposed Filament Bulb
+    const bulbGlassMat = new THREE.MeshStandardMaterial({
+      color: 0xfff7e8,
+      roughness: 0.12,
+      metalness: 0.05,
+      transparent: true,
+      opacity: 0.55,
+    })
+    const bulbGlass = new THREE.Mesh(
+      new THREE.SphereGeometry(0.044, 20, 20),
+      bulbGlassMat
+    )
+    bulbGlass.scale.set(0.92, 1.25, 0.92)
+    bulbGlass.position.set(0, -0.045, 0)
+    lampBody.add(bulbGlass)
+
+    // Glowing Filament Coil
+    const filamentMat = new THREE.MeshStandardMaterial({
+      color: 0xfff0c2,
+      emissive: 0xffc44d,
+      emissiveIntensity: lightModeRef.current ? 4.8 : 0,
+      roughness: 0.2,
+    })
+    const filament = new THREE.Mesh(
+      new THREE.TorusGeometry(0.016, 0.0035, 8, 16),
+      filamentMat
+    )
+    filament.position.set(0, -0.038, 0)
+    filament.rotation.x = Math.PI / 2
+    lampBody.add(filament)
+
+    // Pull Chain with brass bead dangling down past the shade
+    const pullChainGroup = new THREE.Group()
+    pullChainGroup.position.set(0.075, 0.06, 0.04)
+    lampBody.add(pullChainGroup)
+
+    const beadGeo = new THREE.SphereGeometry(0.0035, 8, 8)
+    for (let b = 0; b < 6; b++) {
+      const bead = new THREE.Mesh(beadGeo, fixtureBrassMat)
+      bead.position.set(0, -b * 0.035, 0)
+      pullChainGroup.add(bead)
+    }
+    const pullFob = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.002, 0.0065, 0.024, 10),
+      fixtureBrassMat
+    )
+    pullFob.position.set(0, -6 * 0.035 - 0.012, 0)
+    pullChainGroup.add(pullFob)
+
+    // Hit box for clicking/pulling the lamp directly
+    const hitSphere = new THREE.Mesh(
+      new THREE.SphereGeometry(0.34, 8, 8),
+      new THREE.MeshBasicMaterial({ visible: false })
+    )
+    hitSphere.position.set(0, -0.02, 0)
+    lampBody.add(hitSphere)
+
+    // --- Ceiling Lamp Lights (Illuminate the Room) ---
+    // 1. Broad omnidirectional room point light
+    const pendantPointLight = new THREE.PointLight(0xffeed4, lightModeRef.current ? 4.8 : 0, 16, 1.4)
+    pendantPointLight.position.set(0, -0.05, 0)
+    pendantPointLight.castShadow = true
+    pendantPointLight.shadow.bias = -0.001
+    pendantPointLight.shadow.mapSize.set(512, 512)
+    lampBody.add(pendantPointLight)
+
+    // 2. Focused downward spotlight pooling light on floor and desk
+    const spotTarget = new THREE.Object3D()
+    spotTarget.position.set(0, -4.0, 0)
+    lampBody.add(spotTarget)
+
+    const pendantDownSpot = new THREE.SpotLight(0xfff6e6, lightModeRef.current ? 6.8 : 0, 12, Math.PI / 2.5, 0.65, 1.2)
+    pendantDownSpot.position.set(0, 0.02, 0)
+    pendantDownSpot.target = spotTarget
+    pendantDownSpot.castShadow = true
+    lampBody.add(pendantDownSpot)
+
+    // --- Locomotion & Thinker State ---
+    let standFactor = 0.0           // 0 = seated on stool, 1 = standing & exploring
+    let hasStartedExploring = false // set true when user begins exploring the wall
+    let stoolBaseX = 1.25           // base anchor for the stool on the studio floor
+    let characterTargetX = 1.25     // horizontal target position for character
+    let characterSpeedX = 0         // current horizontal movement speed
+    let walkCycle = 0               // radian phase for walking stride
+    let isWalking = false
+    let idleTimer = 0               // time in seconds since user last moved mouse
+    let lastPointerX = 0
+    let lastPointerY = 0
+    let mouseMovedDistance = 0
+
     // --- Composition Layout: Shift character + lamp 20% to the right ---
     const updateCompositionPosition = () => {
       const d = camera.position.z - 0.85
@@ -1037,9 +1601,20 @@ export default function ThinkingWallHero() {
       const halfWidth = halfHeight * camera.aspect
       // Exact 20% of hero viewport width toward the right
       const deltaX = halfWidth * 0.40
+      stoolBaseX = deltaX
 
-      characterGroup.position.set(deltaX, 0, 0.85)
-      lampGroup.position.set(deltaX - 0.38, 0, 0.98)
+      stoolGroup.position.set(stoolBaseX, 0, 0.85)
+      lampGroup.position.set(stoolBaseX - 0.38, 0, 0.98)
+
+      if (!hasStartedExploring) {
+        characterGroup.position.set(stoolBaseX, 0, 0.85)
+        characterTargetX = stoolBaseX
+      }
+
+      const ceilingLampX = deltaX * 0.45 - 0.15
+      ceilingLampAnchor.set(ceilingLampX, 5.5, 1.15)
+      canopy.position.x = ceilingLampX
+      ceilingLampGroup.position.x = ceilingLampX
     }
     updateCompositionPosition()
 
@@ -1055,14 +1630,43 @@ export default function ThinkingWallHero() {
       mouseNorm.x = ((clientX - rect.left) / rect.width) * 2 - 1
       mouseNorm.y = -(((clientY - rect.top) / rect.height) * 2 - 1)
 
+      // Accumulate pointer movement to trigger standing up once user starts exploring
+      const dxPointer = clientX - lastPointerX
+      const dyPointer = clientY - lastPointerY
+      const moveDelta = Math.sqrt(dxPointer * dxPointer + dyPointer * dyPointer)
+      lastPointerX = clientX
+      lastPointerY = clientY
+
+      idleTimer = 0
+
+      if (!hasStartedExploring && lastPointerX !== 0) {
+        mouseMovedDistance += moveDelta
+        if (mouseMovedDistance > 35) {
+          hasStartedExploring = true
+        }
+      }
+
       // Raycast against the board plane (z = 0)
       raycaster.setFromCamera(new THREE.Vector2(mouseNorm.x, mouseNorm.y), camera)
       const hit = new THREE.Vector3()
       if (raycaster.ray.intersectPlane(boardPlane, hit)) {
-        // Clamp to board perimeter
-        hit.x = THREE.MathUtils.clamp(hit.x, -2.8, 2.8)
-        hit.y = THREE.MathUtils.clamp(hit.y, 0.4, 3.2)
+        // Dynamic full-breadth clamping across the expanded studio wall
+        const d = camera.position.z
+        const vFovRad = THREE.MathUtils.degToRad(camera.fov)
+        const halfHeight = d * Math.tan(vFovRad / 2)
+        const halfWidth = halfHeight * camera.aspect
+        const maxClampX = Math.min(Math.max(halfWidth * 0.98, 5.8), 6.5)
+        hit.x = THREE.MathUtils.clamp(hit.x, -maxClampX, maxClampX)
+        hit.y = THREE.MathUtils.clamp(hit.y, 0.25, 3.65)
         targetBoardPos.copy(hit)
+      }
+
+      // Check hover on lamp
+      const lampHits = raycaster.intersectObjects([hitSphere, shadeExt, shadeRim, bulbGlass], true)
+      if (lampHits.length > 0) {
+        container.style.cursor = 'pointer'
+      } else {
+        container.style.cursor = ''
       }
 
       setHintVisible(false)
@@ -1078,8 +1682,25 @@ export default function ThinkingWallHero() {
       }
     }
 
+    // Direct Click / Tap on Lamp or Pull Chain
+    const handleContainerClick = (e: MouseEvent) => {
+      const rect = container.getBoundingClientRect()
+      const clickMouse = new THREE.Vector2(
+        ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        -(((e.clientY - rect.top) / rect.height) * 2 - 1)
+      )
+      raycaster.setFromCamera(clickMouse, camera)
+      const hits = raycaster.intersectObjects([hitSphere, shadeExt, shadeRim, bulbGlass], true)
+      if (hits.length > 0) {
+        swingVelZ += (Math.random() - 0.5) * 2.6
+        swingVelX += 1.8
+        onToggleTheme?.()
+      }
+    }
+
     window.addEventListener('mousemove', handleMouseMove, { passive: true })
     window.addEventListener('touchmove', handleTouchMove, { passive: true })
+    container.addEventListener('click', handleContainerClick)
 
     // --- Responsive Window Resize ---
     const handleResize = () => {
@@ -1108,6 +1729,21 @@ export default function ThinkingWallHero() {
     )
     observer.observe(container)
 
+    // --- Physics and Animation State for Lamp & Illumination ---
+    const DEPLOYED_Y = 2.45
+    const RETRACTED_Y = 5.25
+    let currentY = lightModeRef.current ? DEPLOYED_Y : RETRACTED_Y
+    let velocityY = 0
+    let rotZ = 0
+    let rotX = 0
+    let swingVelZ = 0
+    let swingVelX = 0
+    let lastLightState = lightModeRef.current
+    let lightSwitchedOn = lightModeRef.current
+    let sparkIntensity = 0
+    let currentIllumination = lightModeRef.current ? 1.0 : 0
+    let headLookUpImpulse = 0
+
     // --- Animation Loop ---
     const clock = new THREE.Clock()
 
@@ -1117,42 +1753,245 @@ export default function ThinkingWallHero() {
         return
       }
 
-      const elapsed = clock.getElapsedTime()
+      const delta = Math.min(clock.getDelta(), 0.05)
+      const isLight = lightModeRef.current
+
+      // Detect light mode toggle transitions
+      if (isLight !== lastLightState) {
+        lastLightState = isLight
+        if (isLight) {
+          // Fall from ceiling!
+          currentY = Math.max(currentY, 4.95)
+          velocityY = -2.8
+          swingVelZ = -3.4
+          swingVelX = 1.6
+          lightSwitchedOn = false
+          sparkIntensity = 0
+        } else {
+          // Retract back into ceiling!
+          playLampClick(false)
+          lightSwitchedOn = false
+          sparkIntensity = 0
+        }
+      }
+
+      // Physics integration for falling & spring bounce
+      if (isLight) {
+        const kSpring = 38
+        const cSpring = 6.6
+        const accelY = -kSpring * (currentY - DEPLOYED_Y) - cSpring * velocityY
+        velocityY += accelY * delta
+        currentY += velocityY * delta
+
+        // Angular pendulum sway
+        const kRot = 18
+        const cRot = 3.2
+        swingVelZ += (-kRot * rotZ - cRot * swingVelZ) * delta
+        rotZ += swingVelZ * delta
+        swingVelX += (-kRot * rotX - cRot * swingVelX) * delta
+        rotX += swingVelX * delta
+
+        // Switch on light as lamp reaches near the bottom of the drop
+        if (currentY <= DEPLOYED_Y + 0.18 && !lightSwitchedOn) {
+          lightSwitchedOn = true
+          playLampClick(true)
+          sparkIntensity = 1.4 // incandescent turn-on burst
+          headLookUpImpulse = 0.24 // character reacts by glancing up!
+        }
+      } else {
+        // Retracting upwards
+        currentY = THREE.MathUtils.lerp(currentY, RETRACTED_Y, 0.075)
+        velocityY = 0
+        rotZ = THREE.MathUtils.lerp(rotZ, 0, 0.08)
+        rotX = THREE.MathUtils.lerp(rotX, 0, 0.08)
+        swingVelZ = 0
+        swingVelX = 0
+      }
+
+      ceilingLampGroup.position.y = currentY
+      lampBody.rotation.z = rotZ
+      lampBody.rotation.x = rotX
+
+      // Update Hanging Braided Cord Geometry
+      const topP = ceilingLampAnchor
+      const bottomP = new THREE.Vector3()
+      fixtureKnuckle.getWorldPosition(bottomP)
+      const cordVec = bottomP.clone().sub(topP)
+      const cordLen = cordVec.length()
+      cord.position.copy(topP.clone().addScaledVector(cordVec, 0.5))
+      cord.scale.set(1, Math.max(0.01, cordLen), 1)
+      cord.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), cordVec.normalize())
+
+      // Room Illumination interpolation
+      const targetIllum = lightSwitchedOn ? 1.0 : 0.0
+      currentIllumination = THREE.MathUtils.lerp(currentIllumination, targetIllum, 0.075)
+
+      sparkIntensity = THREE.MathUtils.lerp(sparkIntensity, 0, 0.12)
+      const effectiveLight = Math.min(1.25, currentIllumination + sparkIntensity)
+
+      // Lamp Bulb & Direct Lights
+      pendantPointLight.intensity = effectiveLight * 4.8
+      pendantDownSpot.intensity = effectiveLight * 6.8
+      filamentMat.emissiveIntensity = effectiveLight * 4.8
+
+      // Room Ambient & Rim Lights (Illuminating the entire room)
+      ambientLight.intensity = THREE.MathUtils.lerp(0.6, 2.35, currentIllumination)
+      ambientLight.color.lerpColors(new THREE.Color(0x20241e), new THREE.Color(0xfff7ea), currentIllumination)
+      rimLight.intensity = THREE.MathUtils.lerp(0.7, 1.85, currentIllumination)
+      rimLight.color.lerpColors(new THREE.Color(0x40483e), new THREE.Color(0xffeed6), currentIllumination)
+      floorBounce.intensity = THREE.MathUtils.lerp(0.4, 1.15, currentIllumination)
+      floorBounce.color.lerpColors(new THREE.Color(0x1a1c18), new THREE.Color(0xebe2d3), currentIllumination)
+
+      // Fog, Background, Studio Materials
+      sceneBgColor.lerpColors(new THREE.Color(0x090a09), new THREE.Color(0xede8dc), currentIllumination)
+      sceneFog.color.lerpColors(new THREE.Color(0x090a09), new THREE.Color(0xede8dc), currentIllumination)
+      sceneFog.density = THREE.MathUtils.lerp(0.055, 0.024, currentIllumination)
+      wallMat.color.lerpColors(new THREE.Color(0x0e100e), new THREE.Color(0xe5ded2), currentIllumination)
+      ceilingMat.color.lerpColors(new THREE.Color(0x0a0c0a), new THREE.Color(0xded7cb), currentIllumination)
+      skirtingMat.color.lerpColors(new THREE.Color(0x161815), new THREE.Color(0x3a352d), currentIllumination)
+      floorMat.color.lerpColors(new THREE.Color(0x0c0e0c), new THREE.Color(0x282c25), currentIllumination)
+      boardMat.color.lerpColors(new THREE.Color(0x111311), new THREE.Color(0x2e332c), currentIllumination)
 
       // 1. Smoothly interpolate spotlight target toward cursor raycast hit
       currentBoardPos.lerp(targetBoardPos, 0.075)
       spotlightTarget.position.copy(currentBoardPos)
 
       // Move spotlight origin slightly to create dynamic shadows across artifacts
-      spotlight.position.x = THREE.MathUtils.lerp(spotlight.position.x, currentBoardPos.x * 0.45, 0.06)
+      spotlight.position.x = THREE.MathUtils.lerp(spotlight.position.x, currentBoardPos.x * 0.52, 0.06)
       spotlight.position.y = THREE.MathUtils.lerp(spotlight.position.y, currentBoardPos.y * 0.4 + 1.2, 0.06)
 
       // Spill light follows close behind
       spillLight.position.x = currentBoardPos.x
       spillLight.position.y = currentBoardPos.y
 
-      // 2. Character Head Tracking:
-      // Only the head and a slight amount of neck react. Torso, shoulders, stool, arms, and legs remain completely stable.
+      // 2. Thinker Stand-up, Locomotion & Pacing Across the Studio Floor
+      // Dynamic floor bounds for character movement along z = 0.85
+      const dFloor = camera.position.z - 0.85
+      const vFovRadFloor = THREE.MathUtils.degToRad(camera.fov)
+      const halfWidthFloor = dFloor * Math.tan(vFovRadFloor / 2) * camera.aspect
+      const maxCharX = Math.min(Math.max(halfWidthFloor * 0.84, 3.8), 5.2)
+
+      // Idle return timer: if inactive for 14s, return to stool and sit
+      if (hasStartedExploring) {
+        idleTimer += delta
+        if (idleTimer > 14.0) {
+          characterTargetX = stoolBaseX
+          if (Math.abs(characterGroup.position.x - stoolBaseX) < 0.08 && Math.abs(characterSpeedX) < 0.04) {
+            hasStartedExploring = false
+            mouseMovedDistance = 0
+          }
+        } else {
+          // Follow spotlight X on the thinking wall with ergonomic offset so silhouette doesn't cover card
+          const viewOffset = targetBoardPos.x > 0 ? -0.32 : 0.32
+          characterTargetX = THREE.MathUtils.clamp(targetBoardPos.x * 0.86 + viewOffset, -maxCharX, maxCharX)
+        }
+      } else {
+        characterTargetX = stoolBaseX
+      }
+
+      // Smoothly interpolate standFactor (0.0 = seated on stool, 1.0 = fully standing)
+      const targetStand = hasStartedExploring ? 1.0 : 0.0
+      const standSpeed = hasStartedExploring ? 0.032 : 0.022
+      standFactor = THREE.MathUtils.lerp(standFactor, targetStand, standSpeed)
+
+      // Slow, contemplative pacing physics across studio floor
+      const distX = characterTargetX - characterGroup.position.x
+      const absDist = Math.abs(distX)
+
+      if (standFactor > 0.65 && absDist > 0.22) {
+        const walkDirection = Math.sign(distX)
+        const maxWalkSpeed = 0.48 // Calm, slow, contemplative studio walk
+        // Gradual acceleration with smooth deceleration as he approaches the card
+        const targetSpeed = Math.min(maxWalkSpeed, absDist * 0.65) * walkDirection
+        characterSpeedX = THREE.MathUtils.lerp(characterSpeedX, targetSpeed, 0.045)
+        characterGroup.position.x += characterSpeedX * delta
+        isWalking = Math.abs(characterSpeedX) > 0.04
+      } else {
+        characterSpeedX = THREE.MathUtils.lerp(characterSpeedX, 0, 0.08)
+        characterGroup.position.x += characterSpeedX * delta
+        isWalking = false
+      }
+
+      // When seated, pin character cleanly at stool position
+      if (standFactor < 0.05 && !hasStartedExploring) {
+        characterGroup.position.x = THREE.MathUtils.lerp(characterGroup.position.x, stoolBaseX, 0.08)
+      }
+
+      // Stride / Walk Cycle phase (scaled to slow pacing cadence)
+      if (isWalking) {
+        const paceCadence = 3.6 // Slow, deliberate steps
+        walkCycle += delta * paceCadence * Math.min(1.0, Math.abs(characterSpeedX) / 0.35)
+      } else {
+        // Relax stride smoothly to neutral stance
+        walkCycle = THREE.MathUtils.lerp(walkCycle, Math.round(walkCycle / Math.PI) * Math.PI, 0.06)
+      }
+
+      const stridePhase = walkCycle
+      const strideMagnitude = isWalking ? Math.min(0.28, Math.abs(characterSpeedX) * 0.65) : 0
+
+      // Leg Angles (Hip & Knee Joint Math)
+      // Seated angles: thigh forward (+1.48 rad ~ 85°), calf down (-1.48 rad)
+      const seatedHipX = 1.48
+      const seatedKneeX = -1.48
+      // Walking swing on hip & knee
+      const walkHipL = Math.sin(stridePhase) * strideMagnitude
+      const walkHipR = -Math.sin(stridePhase) * strideMagnitude
+      const walkKneeL = Math.max(0, -Math.sin(stridePhase)) * strideMagnitude * 0.8
+      const walkKneeR = Math.max(0, Math.sin(stridePhase)) * strideMagnitude * 0.8
+
+      leftLegGroup.rotation.x = THREE.MathUtils.lerp(seatedHipX, walkHipL, standFactor)
+      rightLegGroup.rotation.x = THREE.MathUtils.lerp(seatedHipX, walkHipR, standFactor)
+      leftKneeGroup.rotation.x = THREE.MathUtils.lerp(seatedKneeX, -walkKneeL, standFactor)
+      rightKneeGroup.rotation.x = THREE.MathUtils.lerp(seatedKneeX, -walkKneeR, standFactor)
+
+      // Vertical hip & torso height interpolation
+      const stepBob = isWalking ? Math.abs(Math.sin(stridePhase * 2)) * 0.016 : 0
+      const currentHipY = THREE.MathUtils.lerp(0.58, 0.68, standFactor)
+      const currentTorsoY = THREE.MathUtils.lerp(0.60, 0.70, standFactor) + stepBob
+
+      leftLegGroup.position.y = currentHipY
+      rightLegGroup.position.y = currentHipY
+      torsoGroup.position.y = currentTorsoY
+
+      // Torso posture & lateral sway
+      const torsoSeatedLean = 0.12
+      const torsoStandLean = 0.02
+      const torsoWalkLean = characterSpeedX * 0.025 // subtle lean in travel direction
+      torso.rotation.x = THREE.MathUtils.lerp(torsoSeatedLean, torsoStandLean + torsoWalkLean, standFactor)
+      torso.rotation.z = -characterSpeedX * 0.025 // gentle weight transfer sway
+
+      // Natural counter-arm swings
+      const armSwingL = -Math.sin(stridePhase) * strideMagnitude * 0.65
+      const armSwingR = Math.sin(stridePhase) * strideMagnitude * 0.65
+      leftArmGroup.rotation.x = THREE.MathUtils.lerp(0.12, armSwingL, standFactor)
+      rightArmGroup.rotation.x = THREE.MathUtils.lerp(0.12, armSwingR, standFactor)
+      leftForearmGroup.rotation.x = THREE.MathUtils.lerp(0.22, Math.max(0, -armSwingL * 0.35), standFactor)
+      rightForearmGroup.rotation.x = THREE.MathUtils.lerp(0.22, Math.max(0, -armSwingR * 0.35), standFactor)
+
+      // Gentle body turn towards walking direction
+      const targetFacingY = isWalking ? (characterSpeedX > 0 ? -0.18 : 0.18) : 0.0
+      characterGroup.rotation.y = THREE.MathUtils.lerp(characterGroup.rotation.y, targetFacingY, 0.045)
+
+      // 3. Dynamic Head & Neck Tracking (relative to character's current world position)
       const dx = currentBoardPos.x - characterGroup.position.x
-      const dy = currentBoardPos.y - 1.8 // relative to board center gaze
+      const dy = currentBoardPos.y - 1.8 // relative to board eye-line gaze
 
-      // Yaw: ±18° (±0.314 rad), Pitch: ±10° (±0.174 rad)
-      const maxYaw = 0.314
-      const maxPitch = 0.174
+      const maxYaw = 0.45
+      const maxPitch = 0.22
 
-      // Cursor moves left (dx < 0) -> head turns left (targetYaw > 0)
-      // Cursor moves right (dx > 0) -> head turns right (targetYaw < 0)
-      // Cursor moves upward (dy > 0) -> head tilts upward (targetPitch > 0)
-      // Cursor moves downward (dy < 0) -> head tilts downward (targetPitch < 0)
-      const targetYaw = THREE.MathUtils.clamp(-dx * 0.125, -maxYaw, maxYaw)
-      const targetPitch = THREE.MathUtils.clamp(dy * 0.12, -maxPitch, maxPitch)
+      const targetYaw = THREE.MathUtils.clamp(-dx * 0.16, -maxYaw, maxYaw)
+      const targetPitch = THREE.MathUtils.clamp(dy * 0.14, -maxPitch, maxPitch)
 
-      // Smooth human interpolation / gentle catch-up delay
-      headGroup.rotation.y = THREE.MathUtils.lerp(headGroup.rotation.y, targetYaw, 0.045)
-      headGroup.rotation.x = THREE.MathUtils.lerp(headGroup.rotation.x, targetPitch, 0.045)
+      // Character reacts to falling lamp with a brief upward glance
+      headLookUpImpulse = THREE.MathUtils.lerp(headLookUpImpulse, 0, 0.04)
+      const targetPitchWithReaction = targetPitch + headLookUpImpulse
 
-      neck.rotation.y = headGroup.rotation.y * 0.22
-      neck.rotation.x = headGroup.rotation.x * 0.22
+      // Smooth, deliberate gaze interpolation
+      headGroup.rotation.y = THREE.MathUtils.lerp(headGroup.rotation.y, targetYaw, 0.038)
+      headGroup.rotation.x = THREE.MathUtils.lerp(headGroup.rotation.x, targetPitchWithReaction, 0.038)
+
+      neck.rotation.y = headGroup.rotation.y * 0.25
+      neck.rotation.x = headGroup.rotation.x * 0.25
 
       renderer.render(scene, camera)
       animationFrameId = requestAnimationFrame(tick)
@@ -1163,6 +2002,8 @@ export default function ThinkingWallHero() {
     // --- Cleanup ---
     return () => {
       if (animationFrameId) cancelAnimationFrame(animationFrameId)
+      themeObserver.disconnect()
+      container.removeEventListener('click', handleContainerClick)
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('resize', handleResize)
