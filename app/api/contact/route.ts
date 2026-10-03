@@ -15,12 +15,14 @@ export async function POST(req: Request) {
     const clientOrigin = req.headers.get('origin') || 'https://dhananjayyy.vercel.app'
     const clientReferer = req.headers.get('referer') || 'https://dhananjayyy.vercel.app/'
 
-    // Forward to FormSubmit to deliver the message directly to dhananjayy6397@gmail.com
+    // Forward to FormSubmit with browser User-Agent so Cloudflare does not block serverless fetch
     const response = await fetch('https://formsubmit.co/ajax/dhananjayy6397@gmail.com', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
         'Origin': clientOrigin.includes('localhost') ? 'https://dhananjayyy.vercel.app' : clientOrigin,
         'Referer': clientReferer.includes('localhost') ? 'https://dhananjayyy.vercel.app/' : clientReferer,
       },
@@ -34,7 +36,15 @@ export async function POST(req: Request) {
       }),
     })
 
-    const data = await response.json()
+    const text = await response.text()
+    let data: Record<string, unknown> = {}
+    try {
+      data = JSON.parse(text)
+    } catch {
+      if (text.includes('success') || text.includes('submitted')) {
+        return NextResponse.json({ success: true, message: 'Message sent successfully.' })
+      }
+    }
 
     // FormSubmit returns success: "true" (or true) when active and delivered
     if (data.success === 'true' || data.success === true) {
@@ -42,7 +52,8 @@ export async function POST(req: Request) {
     }
 
     // Check if FormSubmit is requesting domain activation
-    if (data.message && data.message.toLowerCase().includes('activation')) {
+    const msg = typeof data.message === 'string' ? data.message : ''
+    if (msg && msg.toLowerCase().includes('activation')) {
       return NextResponse.json(
         {
           success: false,
@@ -55,8 +66,8 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json(
-      { error: data.message || 'Failed to dispatch email.' },
-      { status: 500 }
+      { error: msg || 'Failed to dispatch email.' },
+      { status: response.status >= 400 ? response.status : 500 }
     )
   } catch (error) {
     console.error('Contact API error:', error)

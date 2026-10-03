@@ -133,28 +133,72 @@ function ContactForm() {
     setStatus('loading')
     setStatusMessage('')
 
+    // Strategy 1: Direct client-side submission to FormSubmit (activated for https://dhananjayyy.vercel.app/)
+    try {
+      const res = await fetch('https://formsubmit.co/ajax/dhananjayy6397@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          _subject: `Portfolio Message from ${formData.name} (${formData.email})`,
+          _captcha: 'false',
+          _template: 'table',
+        }),
+      })
+
+      const text = await res.text()
+      let data: { success?: string | boolean; message?: string } = {}
+      try {
+        data = JSON.parse(text)
+      } catch {
+        if (text.includes('success') || text.includes('submitted')) {
+          data = { success: true }
+        }
+      }
+
+      if (res.ok && (data.success === 'true' || data.success === true || (text && text.includes('submitted')))) {
+        setStatus('success')
+        setStatusMessage('Your message has been sent directly to Dhananjay! I will reply shortly.')
+        setFormData({ name: '', email: '', message: '' })
+        return
+      }
+    } catch {
+      // Direct submission failed (e.g. ad-blocker), try fallback
+    }
+
+    // Strategy 2: Serverless proxy route (/api/contact)
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       })
-      const data = await res.json()
+      const text = await res.text()
+      let data: { success?: boolean; error?: string } = {}
+      try {
+        data = JSON.parse(text)
+      } catch {}
 
       if (res.ok && data.success) {
         setStatus('success')
         setStatusMessage('Your message has been sent directly to Dhananjay! I will reply shortly.')
         setFormData({ name: '', email: '', message: '' })
-      } else {
-        setStatus('error')
-        setStatusMessage(
-          data.error || 'Could not send message automatically. Please use the Gmail option below.'
-        )
+        return
       }
+
+      setStatus('error')
+      setStatusMessage(
+        data.error || 'Could not send message automatically. Please click "Compose in Gmail" below to email directly.'
+      )
     } catch {
       setStatus('error')
       setStatusMessage(
-        'Network error while sending. You can reach out directly via Gmail below.'
+        'Network error while sending. Please click "Compose in Gmail" below to email directly.'
       )
     }
   }
